@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kiểm toán Toàn diện — PhotoCull AI (102 Vấn đề)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#060a13;--s:rgba(15,23,42,.6);--t:#94a3b8;--tb:#e2e8f0;--red:#f87171;--amb:#fbbf24;--grn:#34d399;--cyan:#22d3ee;--pur:#a78bfa}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t);line-height:1.6}
+.p{max-width:960px;margin:0 auto;padding:40px 20px 80px}
+.hd{text-align:center;padding:50px 30px;background:var(--s);border:1px solid rgba(251,191,36,.08);border-radius:24px;margin-bottom:40px;position:relative;overflow:hidden}
+.hd::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(135deg,#f59e0b,#ef4444)}
+h1{font-size:2.2rem;font-weight:900;background:linear-gradient(135deg,#f59e0b,#ef4444);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.sub{color:#475569;max-width:600px;margin:0 auto}
+.badge{display:inline-block;padding:5px 14px;border-radius:99px;font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#0f172a;margin-bottom:12px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:30px 0}
+.stat{background:var(--s);border-radius:16px;padding:20px;text-align:center;border:1px solid rgba(255,255,255,.05)}
+.stat .n{font-size:2rem;font-weight:900;line-height:1}.stat .l{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-top:4px}
+.cr .n{color:var(--red)}.im .n{color:var(--amb)}.mi .n{color:var(--grn)}.to .n{color:var(--cyan)}
+h2{font-size:1.3rem;font-weight:800;color:var(--tb);margin:32px 0 12px;display:flex;align-items:center;gap:8px}
+h2 .f{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--pur);background:rgba(167,139,250,.1);padding:2px 8px;border-radius:6px}
+table{width:100%;border-collapse:collapse;font-size:.78rem;margin-bottom:24px}
+th{background:rgba(251,191,36,.06);color:var(--tb);font-weight:700;text-align:left;padding:8px 10px;border-bottom:2px solid rgba(251,191,36,.12);position:sticky;top:0}
+td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.03)}
+tr:hover td{background:rgba(255,255,255,.02)}
+.sev{font-size:.65rem;font-weight:800;padding:2px 8px;border-radius:4px;text-transform:uppercase;white-space:nowrap}
+.s-c{background:rgba(248,113,113,.12);color:var(--red)}.s-i{background:rgba(251,191,36,.12);color:var(--amb)}.s-m{background:rgba(34,211,153,.1);color:var(--grn)}
+code{font-family:'JetBrains Mono',monospace;background:rgba(251,191,36,.08);padding:1px 5px;border-radius:3px;font-size:.8em;color:var(--amb)}
+.top10{background:linear-gradient(135deg,rgba(251,191,36,.06),rgba(239,68,68,.06));border:1px solid rgba(251,191,36,.12);border-radius:16px;padding:24px;margin-top:30px}
+.top10 h2{margin-top:0;justify-content:center}
+.top10 ol{padding-left:20px;counter-reset:item}
+.top10 li{margin-bottom:8px;font-size:.85rem;color:var(--tb)}
+.top10 li strong{color:var(--amb)}
+</style>
+</head>
+<body>
+<div class="p">
+<header class="hd">
+<span class="badge">Kiểm toán Toàn diện Mã nguồn</span>
+<h1>PhotoCull AI — Phát hiện 102 Vấn đề</h1>
+<p class="sub">Kiểm toán toàn diện tất cả 13 file nguồn. Xác định và phân loại các artifact từ việc code theo cảm tính (vibe coding).</p>
+</header>
+
+<div class="stats">
+<div class="stat cr"><div class="n">9</div><div class="l">🔴 Nghiêm trọng</div></div>
+<div class="stat im"><div class="n">34</div><div class="l">🟡 Quan trọng</div></div>
+<div class="stat mi"><div class="n">59</div><div class="l">🟢 Nhỏ</div></div>
+<div class="stat to"><div class="n">102</div><div class="l">📋 Tổng số</div></div>
+</div>
+
+<!-- A -->
+<h2>A. Thuật toán Nhóm ảnh <span class="f">imageUtils.ts</span></h2>
+<table><thead><tr><th>#</th><th>Vấn đề</th><th>Mức độ</th><th>Dòng</th></tr></thead><tbody>
+<tr><td>1</td><td>So sánh chuỗi (Chain Comparison) chỉ kiểm tra các ảnh liền kề — các ảnh giống nhau ở xa KHÔNG BAO GIỜ được nhóm</td><td><span class="sev s-c">Nghiêm trọng</span></td><td>228</td></tr>
+<tr><td>2</td><td>File không được sắp xếp trước khi nhóm — thứ tự của trình duyệt là ngẫu nhiên</td><td><span class="sev s-c">Nghiêm trọng</span></td><td>163</td></tr>
+<tr><td>3</td><td>Ngưỡng cố định 12/64 — không có sự điều chỉnh thích ứng theo từng loại ảnh</td><td><span class="sev s-i">Quan trọng</span></td><td>216</td></tr>
+<tr><td>4</td><td>Không phân tích cú pháp EXIF DateTimeOriginal để nhóm</td><td><span class="sev s-i">Quan trọng</span></td><td>—</td></tr>
+<tr><td>5</td><td>Không phát hiện trùng lặp khi cùng một thư mục được thả vào hai lần</td><td><span class="sev s-i">Quan trọng</span></td><td>—</td></tr>
+<tr><td>6</td><td>Sử dụng Average Hash (aHash) — dễ bị nhiễu do gradient/panorama</td><td><span class="sev s-i">Quan trọng</span></td><td>90</td></tr>
+<tr><td>7</td><td>Hash được lưu trữ dưới dạng chuỗi '0'/'1' — tốn RAM gấp 8 lần so với BigInt</td><td><span class="sev s-m">Nhỏ</span></td><td>108</td></tr>
+<tr><td>8</td><td>Lỗi hash cũ: ObjectURL không được thu hồi khi reject()</td><td><span class="sev s-i">Quan trọng</span></td><td>128</td></tr>
+<tr><td>9</td><td>Canvas được tạo trên mỗi cuộc gọi hash — không có cơ chế pooling/tái sử dụng</td><td><span class="sev s-m">Nhỏ</span></td><td>77</td></tr>
+<tr><td>10</td><td><code>resizeImageToBase64</code> chạy trên luồng chính thông qua <code>new Image()</code> — gây đơ UI</td><td><span class="sev s-i">Quan trọng</span></td><td>15</td></tr>
+<tr><td>11</td><td>Không có Web Worker để tạo hash — xử lý 10k ảnh sẽ làm đóng băng trình duyệt hơn 30 giây</td><td><span class="sev s-c">Nghiêm trọng</span></td><td>175</td></tr>
+<tr><td>12</td><td>BATCH_SIZE=50 với <code>Promise.all</code> — có thể gây tràn bộ nhớ (OOM) với 50 bitmap đồng thời</td><td><span class="sev s-i">Quan trọng</span></td><td>172</td></tr>
+<tr><td>13</td><td>Sử dụng <code>setTimeout(0)</code> để nhường quyền xử lý — nên dùng <code>requestIdleCallback</code></td><td><span class="sev s-m">Nhỏ</span></td><td>205</td></tr>
+<tr><td>14</td><td>Không có điểm số độ nét Laplacian — không thể tự động chọn ảnh nét nhất</td><td><span class="sev s-i">Quan trọng</span></td><td>—</td></tr>
+</tbody></table>
+
+<!-- B -->
+<h2>B. Quản lý Nhóm <span class="f">useImageGroups.ts</span></h2>
+<table><thead><tr><th>#</th><th>Vấn đề</th><th>Mức độ</th><th>Dòng</th></tr></thead><tbody>
+<tr><td>15</td><td><code>handleMoveImage</code> không kiểm tra nhóm trống sau khi di chuyển ảnh cuối cùng</td><td><span class="sev s-i">Quan trọng</span></td><td>42</td></tr>
+<tr><td>16</td><td>Di chuyển ảnh không đặt lại bestImageIds/status trên nhóm đích</td><td><span class="sev s-m">Nhỏ</span></td><td>65</td></tr>
+<tr><td>17</td><td>Gộp nhóm chỉ giữ lại selectionReason từ nhóm 1 — mất bối cảnh hợp lệ</td><td><span class="sev s-i">Quan trọng</span></td><td>119</td></tr>
+<tr><td>18</td><td>Gộp hai nhóm đã xử lý ('done') vẫn giữ status='done' — phân tích bị lỗi thời</td><td><span class="sev s-i">Quan trọng</span></td><td>118</td></tr>
+<tr><td>19</td><td><code>handleDeleteImage</code> không bao giờ thu hồi ObjectURL — rò rỉ bộ nhớ</td><td><span class="sev s-i">Quan trọng</span></td><td>160</td></tr>
+<tr><td>20</td><td><code>handleDeleteGroup</code> không bao giờ thu hồi ObjectURLs cho tất cả ảnh</td><td><span class="sev s-i">Quan trọng</span></td><td>198</td></tr>
+<tr><td>21</td><td><code>handleEmptyTrash</code> không bao giờ thu hồi URLs — tất cả ảnh trong thùng rác vẫn nằm trong RAM</td><td><span class="sev s-c">Nghiêm trọng</span></td><td>278</td></tr>
+<tr><td>22</td><td>Sắp xếp sử dụng <code>file.lastModified</code> thay vì thời gian chụp EXIF</td><td><span class="sev s-m">Nhỏ</span></td><td>141</td></tr>
+<tr><td>23</td><td>Chia nhỏ tạo ra <code>status:'pending'</code> nhưng vẫn giữ <code>bestImageIds</code> cũ — mâu thuẫn</td><td><span class="sev s-m">Nhỏ</span></td><td>92</td></tr>
+<tr><td>24</td><td>Khôi phục tìm nhóm "Đã khôi phục" bằng chuỗi tiêu đề — cách khớp lỏng lẻo, dễ lỗi</td><td><span class="sev s-m">Nhỏ</span></td><td>251</td></tr>
+<tr><td>25</td><td>Không có tính năng Hoàn tác/Làm lại (Undo/Redo) cho các thao tác nhóm</td><td><span class="sev s-m">Nhỏ</span></td><td>—</td></tr>
+<tr><td>26</td><td><code>groupsRef</code> được đồng bộ hóa qua useEffect — có thể bị cũ trong cùng một chu kỳ render</td><td><span class="sev s-i">Quan trọng</span></td><td>10</td></tr>
+</tbody></table>
+
+<!-- C -->
+<h2>C. Phân tích AI <span class="f">useAIAnalysis.ts (836 dòng)</span></h2>
+<table><thead><tr><th>#</th><th>Vấn đề</th><th>Mức độ</th><th>Dòng</th></tr></thead><tbody>
+<tr><td>27</td><td>File dài 836 dòng — nên được chia nhỏ thành các module riêng biệt</td><td><span class="sev s-i">Quan trọng</span></td><td>—</td></tr>
+<tr><td>28</td><td>Vòng lặp <code>while(true)</code> trong phân tích hàng loạt — tiềm ẩn nguy cơ lặp vô hạn</td><td><span class="sev s-c">Nghiêm trọng</span></td><td>182</td></tr>
+<tr><td>29</td><td>Tự động tải file ZIP sau khi xử lý hàng loạt — không hỏi ý kiến người dùng</td><td><span class="sev s-i">Quan trọng</span></td><td>286</td></tr>
+<tr><td>30</td><td><code>handleSmartCleanup</code> gọi AI cho từng ảnh bị cô lập một cách tuần tự — Số lượng gọi API là O(n)</td><td><span class="sev s-c">Nghiêm trọng</span></td><td>518</td></tr>
+<tr><td>31</td><td>SmartCleanup không có thanh tiến trình chi tiết</td><td><span class="sev s-m">Nhỏ</span></td><td>509</td></tr>
+<tr><td>32</td><td>SmartMerge chỉ sử dụng ảnh đầu tiên làm đại diện cho nhóm</td><td><span class="sev s-i">Quan trọng</span></td><td>437</td></tr>
+<tr><td>33</td><td>BatchRefine CONCURRENCY=1 — quá chậm</td><td><span class="sev s-m">Nhỏ</span></td><td>370</td></tr>
+<tr><td>34</td><td>Sử dụng <code>confirm()</code> làm chặn luồng chính</td><td><span class="sev s-i">Quan trọng</span></td><td>366</td></tr>
+<tr><td>35</td><td>Nâng cấp hàng loạt bỏ qua các ảnh đã có editedImageUrl — không có tùy chọn tạo lại</td><td><span class="sev s-m">Nhỏ</span></td><td>629</td></tr>
+<tr><td>36</td><td>Interface được định nghĩa bên trong callback — anti-pattern</td><td><span class="sev s-m">Nhỏ</span></td><td>728</td></tr>
+<tr><td>37</td><td><code>shouldStopBatchRef</code> được chia sẻ giữa phân tích và nâng cấp — xung đột nếu cả hai cùng chạy</td><td><span class="sev s-i">Quan trọng</span></td><td>18</td></tr>
+<tr><td>38</td><td>Không có bộ giới hạn tốc độ thông minh (rate limiter) — chỉ có độ trễ cố định 1-2 giây</td><td><span class="sev s-i">Quan trọng</span></td><td>251</td></tr>
+<tr><td>39</td><td>Phát hiện lỗi qua <code>msg.includes('429')</code> — khớp chuỗi lỏng lẻo, dễ lỗi</td><td><span class="sev s-i">Quan trọng</span></td><td>275</td></tr>
+<tr><td>40</td><td>Nâng cấp ảnh đơn lẻ: 3 cuộc gọi API tuần tự (gợi ý→tạo→báo cáo)</td><td><span class="sev s-m">Nhỏ</span></td><td>107</td></tr>
+</tbody></table>
+
+<!-- D -->
+<h2>D. Dịch vụ Gemini <span class="f">geminiService.ts (726 dòng)</span></h2>
+<table><thead><tr><th>#</th><th>Vấn đề</th><th>Mức độ</th><th>Dòng</th></tr></thead><tbody>
+<tr><td>41</td><td><code>new GoogleGenAI()</code> được tạo trên MỖI cuộc gọi hàm — nên dùng singleton</td><td><span class="sev s-i">Quan trọng</span></td><td>60</td></tr>
+<tr><td>42</td><td><code>process.env.API_KEY</code> không hoạt động trong trình duyệt Vite — phải dùng <code>import.meta.env</code></td><td><span class="sev s-c">Nghiêm trọng</span></td><td>49</td></tr>
+<tr><td>43</td><td>retryWithBackoff tối đa 6×exponential = chờ tới 64 giây</td><td><span class="sev s-m">Nhỏ</span></td><td>10</td></tr>
+<tr><td>44</td><td>Prompt trộn lẫn tiếng Việt và tiếng Anh — đầu ra của AI không đồng nhất</td><td><span class="sev s-m">Nhỏ</span></td><td>84</td></tr>
+<tr><td>45</td><td>Thay đổi kích thước TẤT CẢ ảnh trước khi gửi — nhóm 20 ảnh có thể gây OOM</td><td><span class="sev s-i">Quan trọng</span></td><td>69</td></tr>
+<tr><td>46</td><td>Không có bộ nhớ cache phân tích — tải lại trang sẽ mất tất cả</td><td><span class="sev s-i">Quan trọng</span></td><td>—</td></tr>
+<tr><td>47</td><td>Biến thể (Variations): 4 kiểu chạy tuần tự với độ trễ 5-8s mỗi kiểu ≈ tổng cộng 30s</td><td><span class="sev s-m">Nhỏ</span></td><td>641</td></tr>
+<tr><td>48</td><td>Cài đặt an toàn sử dụng BLOCK_NONE — có thể bị Google từ chối</td><td><span class="sev s-m">Nhỏ</span></td><td>569</td></tr>
+<tr><td>49</td><td>Sử dụng <code>@ts-ignore</code> trên cài đặt an toàn — bỏ qua kiểm tra kiểu dữ liệu</td><td><span class="sev s-m">Nhỏ</span></td><td>586</td></tr>
+<tr><td>50</td><td>Báo cáo cải thiện gửi 2 ảnh base64 đầy đủ — lãng phí token</td><td><span class="sev s-i">Quan trọng</span></td><td>684</td></tr>
+<tr><td>51</td><td>Không có hàng đợi/bộ bóp băng thông yêu cầu toàn cục — các tính năng song song sẽ đụng giới hạn tần suất (rate limit)</td><td><span class="sev s-c">Nghiêm trọng</span></td><td>—</td></tr>
+<tr><td>52</td><td>Mã hóa cứng model <code>gemini-2.5-flash</code> — không có lựa chọn model</td><td><span class="sev s-m">Nhỏ</span></td><td>140</td></tr>
+<tr><td>53</td><td>Không đếm số lượng token — người dùng không thể thấy chi phí API</td><td><span class="sev s-m">Nhỏ</span></td><td>—</td></tr>
+<tr><td>54</td><td>Dự phòng lỗi trả về <code>bestIndices:[0]</code> — luôn chọn ảnh đầu tiên khi có lỗi</td><td><span class="sev s-i">Quan trọng</span></td><td>221</td></tr>
+</tbody></table>
+
+<!-- E -->
+<h2>E. Component App <span class="f">App.tsx (796 dòng)</span></h2>
+<table><thead><tr><th>#</th><th>Vấn đề</th><th>Mức độ</th><th>Dòng</th></tr></thead><tbody>
+<tr><td>55</td><td>Component Thần thánh (God Component) dài 796 dòng — state + logic + 500 dòng JSX trong một file</td><td><span class="sev s-c">Nghiêm trọng</span></td><td>—</td></tr>
+<tr><td>56</td><td>Hơn 20 hooks useState trong một component đơn lẻ</td><td><span class="sev s-i">Quan trọng</span></td><td>20-89</td></tr>
+<tr><td>57</td><td>Ảnh Sau/Trước: Vòng lặp forEach O(n×m) để tìm ảnh hiện tại</td><td><span class="sev s-i">Quan trọng</span></td><td>169</td></tr>
+<tr><td>58</td><td>filteredGroups useMemo tính toán lại trên bất kỳ thay đổi nhóm nào</td><td><span class="sev s-i">Quan trọng</span></td><td>108</td></tr>
+<tr><td>59</td><td>Bộ lọc tìm kiếm chạy <code>.toLowerCase()</code> mỗi lần render — cần debounce</td><td><span class="sev s-m">Nhỏ</span></td><td>128</td></tr>
+<tr><td>60</td><td>Callback <code>itemContent</code> phụ thuộc vào hơn 12 phần phụ thuộc — bị tạo lại quá thường xuyên</td><td><span class="sev s-i">Quan trọng</span></td><td>275</td></tr>
+<tr><td>61-68</td><td>8 vấn đề nhỏ: mũi tên nội tuyến, confirm() chặn luồng, khớp class CSS, Virtuoso overscan=500, v.v.</td><td><span class="sev s-m">Nhỏ</span></td><td>nhiều nơi</td></tr>
+</tbody></table>
+
+<!-- F -->
+<h2>F. Các Component <span class="f">PhotoGroup / PhotoCard / ImageModal / DropZone / Trash</span></h2>
+<table><thead><tr><th>#</th><th>Vấn đề</th><th>Mức độ</th><th>File</th></tr></thead><tbody>
+<tr><td>69</td><td>PhotoGroup.tsx: 554 dòng — nên tách header/toolbar/grid</td><td><span class="sev s-i">Quan trọng</span></td><td>PhotoGroup</td></tr>
+<tr><td>70-72</td><td>PhotoGroup: memo thiếu kiểm tra, closures nội tuyến, cột grid cứng nhắc</td><td><span class="sev s-m">Nhỏ</span></td><td>PhotoGroup</td></tr>
+<tr><td>73-77</td><td>PhotoCard: thiếu bộ so sánh memo tùy chỉnh, logic URL dư thừa, văn bản thay thế (alt) không tốt, infinite animate-pulse</td><td><span class="sev s-m">Nhỏ</span></td><td>PhotoCard</td></tr>
+<tr><td>78</td><td>ImageModal.tsx: 873 dòng — File LỚN NHẤT, God Component</td><td><span class="sev s-c">Nghiêm trọng</span></td><td>ImageModal</td></tr>
+<tr><td>79-86</td><td>ImageModal: tự động fetch API, không kiểm tra unmount, không debounce trên thanh trượt, so sánh JSON.stringify</td><td><span class="sev s-i">Quan trọng</span></td><td>ImageModal</td></tr>
+<tr><td>87</td><td>DropZone: không lọc loại file khi kéo thả — chấp nhận cả file không phải ảnh</td><td><span class="sev s-i">Quan trọng</span></td><td>DropZone</td></tr>
+<tr><td>88-90</td><td>DropZone: không có phản hồi khi kéo qua, không thực thi giới hạn, không hỗ trợ thả thư mục</td><td><span class="sev s-m">Nhỏ</span></td><td>DropZone</td></tr>
+<tr><td>91</td><td>TrashModal: hiển thị thumbnailUrl có thể bị thu hồi sau khi sửa</td><td><span class="sev s-i">Quan trọng</span></td><td>TrashModal</td></tr>
+<tr><td>92-95</td><td>TrashModal/InfoModal: không phân trang, không xóa từng mục, số lượng quota được mã hóa cứng</td><td><span class="sev s-m">Nhỏ</span></td><td>nhiều nơi</td></tr>
+</tbody></table>
+
+<!-- G+H -->
+<h2>G–H. Quản lý Dự án & Kiểu dữ liệu <span class="f">useProjectManager.ts / types.ts</span></h2>
+<table><thead><tr><th>#</th><th>Vấn đề</th><th>Mức độ</th><th>Dòng</th></tr></thead><tbody>
+<tr><td>96</td><td>useProjectManager.ts: 700 dòng — cần tách save/load/serialize</td><td><span class="sev s-i">Quan trọng</span></td><td>—</td></tr>
+<tr><td>97</td><td><code>dirHandleRef</code> được kiểu hóa là <code>any</code> — mất an toàn kiểu dữ liệu</td><td><span class="sev s-m">Nhỏ</span></td><td>23</td></tr>
+<tr><td>98</td><td>Dự án JSON lưu trữ ảnh AI base64 nội tuyến — dung lượng file có thể vượt quá 100MB</td><td><span class="sev s-c">Nghiêm trọng</span></td><td>44</td></tr>
+<tr><td>99</td><td>Không có xác thực phiên bản file dự án khi tải</td><td><span class="sev s-i">Quan trọng</span></td><td>—</td></tr>
+<tr><td>100-102</td><td>Code chết: các trường <code>ProcessedImage.isBest</code>, <code>.score</code>, <code>.reason</code> không bao giờ được đặt</td><td><span class="sev s-m">Nhỏ</span></td><td>types:8-10</td></tr>
+</tbody></table>
+
+<!-- TOP 10 -->
+<div class="top10">
+<h2>🎯 Top 10 Sửa đổi Ưu tiên</h2>
+<ol>
+<li><strong>#42</strong> — <code>process.env.API_KEY</code> → <code>import.meta.env.VITE_API_KEY</code></li>
+<li><strong>#1+2</strong> — Sửa Chain Comparison + sắp xếp file trước khi nhóm</li>
+<li><strong>#11</strong> — Sử dụng Web Workers để tạo hash → ngăn chặn đơ UI</li>
+<li><strong>#55+78</strong> — Chia nhỏ các file monolith App.tsx (796L) và ImageModal.tsx (873L)</li>
+<li><strong>#21+19+20</strong> — Thu hồi ObjectURLs khi xóa/thùng rác/làm trống</li>
+<li><strong>#51</strong> — Hàng đợi yêu cầu API toàn cục với giới hạn tần suất (rate limiting)</li>
+<li><strong>#98</strong> — Không lưu base64 trong JSON → sử dụng file bên ngoài</li>
+<li><strong>#28</strong> — Thêm biện pháp bảo vệ timeout cho vòng lặp hàng loạt <code>while(true)</code></li>
+<li><strong>#30</strong> — Gọi API Batch SmartCleanup thay vì gọi từng cái một</li>
+<li><strong>#42</strong> — Tạo trừu tượng AI Provider cho Ollama/OpenRouter/Gemini</li>
+</ol>
+</div>
+
+</div>
+</body>
+</html>

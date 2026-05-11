@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phân tích chuyên sâu: Tối ưu hóa 10.000+ ảnh — Thuật toán thuần túy, Không dùng AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #060a13;
+            --surface: rgba(15, 23, 42, 0.6);
+            --surface-bright: rgba(30, 41, 59, 0.5);
+            --border: rgba(56, 189, 248, 0.08);
+            --border-bright: rgba(56, 189, 248, 0.2);
+            --text: #94a3b8;
+            --text-bright: #e2e8f0;
+            --text-muted: #475569;
+            --cyan: #22d3ee;
+            --blue: #3b82f6;
+            --purple: #a78bfa;
+            --green: #34d399;
+            --amber: #fbbf24;
+            --red: #f87171;
+            --grad-cyan: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            --grad-purple: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            --grad-green: linear-gradient(135deg, #10b981 0%, #22d3ee 100%);
+            --grad-amber: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        .page-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+        }
+
+        /* Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 50px 30px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--grad-cyan);
+        }
+        .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+        .badge-cyan { background: var(--grad-cyan); color: #0f172a; }
+        .badge-red { background: rgba(248, 113, 113, 0.15); color: var(--red); border: 1px solid rgba(248, 113, 113, 0.2); }
+        .badge-green { background: rgba(52, 211, 153, 0.15); color: var(--green); border: 1px solid rgba(52, 211, 153, 0.2); }
+
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 900;
+            background: var(--grad-cyan);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+            margin-bottom: 12px;
+        }
+        .subtitle {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 40px;
+        }
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-bright);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h2 .icon {
+            font-size: 1.5rem;
+        }
+        h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--cyan);
+            margin: 16px 0 8px;
+        }
+
+        p { margin-bottom: 12px; }
+        strong { color: var(--text-bright); }
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(56, 189, 248, 0.08);
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            color: var(--cyan);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            transition: border-color 0.3s;
+        }
+        .card:hover {
+            border-color: var(--border-bright);
+        }
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text-bright);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Problem Box */
+        .problem-box {
+            background: rgba(248, 113, 113, 0.06);
+            border: 1px solid rgba(248, 113, 113, 0.15);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .problem-box .card-title { color: var(--red); }
+
+        /* Good/Bad */
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        @media (max-width: 600px) {
+            .status-grid { grid-template-columns: 1fr; }
+        }
+        .status-card {
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .status-good {
+            background: rgba(52, 211, 153, 0.06);
+            border: 1px solid rgba(52, 211, 153, 0.15);
+        }
+        .status-bad {
+            background: rgba(248, 113, 113, 0.06);
+            border: 1px solid rgba(248, 113, 113, 0.15);
+        }
+        .status-card h4 {
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .status-good h4 { color: var(--green); }
+        .status-bad h4 { color: var(--red); }
+
+        ul {
+            padding-left: 20px;
+            margin-bottom: 12px;
+        }
+        li {
+            margin-bottom: 6px;
+        }
+
+        /* Pipeline */
+        .pipeline {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+        .pipeline-step {
+            display: flex;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .pipeline-step:last-child { border-bottom: none; }
+        .step-num {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        .step-1 .step-num { background: var(--grad-green); color: #0f172a; }
+        .step-2 .step-num { background: var(--grad-cyan); color: #0f172a; }
+        .step-3 .step-num { background: var(--grad-purple); color: white; }
+        .step-4 .step-num { background: var(--grad-amber); color: #0f172a; }
+        .step-content { flex: 1; }
+        .step-title {
+            font-weight: 700;
+            color: var(--text-bright);
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+        .step-detail {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .step-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            padding: 3px 10px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.04);
+            color: var(--amber);
+            font-weight: 600;
+            white-space: nowrap;
+            align-self: center;
+        }
+
+        /* Summary Box */
+        .summary-box {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
+            border: 1px solid rgba(56, 189, 248, 0.15);
+            border-radius: 16px;
+            padding: 28px;
+            margin-top: 30px;
+        }
+        .summary-box h2 {
+            background: var(--grad-cyan);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .metric-row {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 20px;
+        }
+        .metric {
+            text-align: center;
+        }
+        .metric-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: var(--grad-cyan);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+
+        <!-- HEADER -->
+        <header class="page-header">
+            <span class="badge badge-cyan">Phân tích Hiệu năng & Quy mô</span>
+            <h1>Tối ưu hóa 10.000+ Ảnh</h1>
+            <p class="subtitle">Kỹ thuật thuật toán thuần túy để chọn lọc ảnh siêu nhanh — không cần AI đám mây cho việc nhóm, chấm điểm và chọn trước.</p>
+        </header>
+
+        <!-- PROBLEM -->
+        <section class="section">
+            <div class="problem-box">
+                <div class="card-title">⚠️ Thách thức Cốt lõi</div>
+                <p>Khi người dùng mở một thư mục có <strong>10.000+ file ảnh</strong> (mỗi file 5-20MB, tổng cộng 50-200GB), trình duyệt chỉ có khoảng ~2-4GB RAM khả dụng. Tải tất cả cùng lúc sẽ làm sập tab ngay lập tức.</p>
+                <p><strong>Quy tắc vàng:</strong> Không bao giờ tải tất cả ảnh vào bộ nhớ. Xử lý theo từng đợt nhỏ (batch), giải phóng bộ nhớ ngay sau khi sử dụng.</p>
+            </div>
+        </section>
+
+        <!-- CURRENT CODE ANALYSIS -->
+        <section class="section">
+            <h2><span class="icon">🔍</span> Phân tích Code hiện tại (<code>imageUtils.ts</code>)</h2>
+            <div class="status-grid">
+                <div class="status-card status-good">
+                    <h4>✅ Điểm tốt hiện tại</h4>
+                    <ul>
+                        <li><code>createImageBitmap()</code> — giải mã C++ gốc</li>
+                        <li>pHash 8×8 (64-bit) — kích thước hash siêu nhỏ</li>
+                        <li>Xử lý theo đợt (50 file/batch)</li>
+                        <li><code>bitmap.close()</code> — dọn dẹp tường minh</li>
+                        <li><code>setTimeout(0)</code> — nhường luồng cho UI</li>
+                    </ul>
+                </div>
+                <div class="status-card status-bad">
+                    <h4>❌ Điểm cần cải thiện</h4>
+                    <ul>
+                        <li>10k ObjectURL không bao giờ được thu hồi → <strong>Lãng phí hàng GB RAM</strong></li>
+                        <li>So sánh chuỗi (Chain comparison) chỉ kiểm tra các file liền kề</li>
+                        <li>Chưa phân tích EXIF (thiếu dữ liệu mốc thời gian)</li>
+                        <li>Chưa chấm điểm độ nét (Laplacian)</li>
+                        <li>Tất cả xử lý nằm trên Luồng chính (Main Thread) → **Đơ UI**</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- TECHNIQUES -->
+        <section class="section">
+            <h2><span class="icon">⚡</span> Kỹ thuật Tối ưu hóa (Thuật toán thuần túy)</h2>
+
+            <div class="card">
+                <div class="card-title">🔧 3.1 Web Worker Pool — Đa luồng thực sự</div>
+                <p><strong>Vấn đề:</strong> JavaScript là đơn luồng. Xử lý 10k ảnh trên Luồng chính = UI chết đứng.</p>
+                <p><strong>Giải pháp:</strong> Tạo một nhóm (pool) gồm <strong>4-8 Web Worker</strong> (khớp với số nhân CPU). Mỗi Worker xử lý một đợt file và trả về kết quả (hash, EXIF, điểm độ nét).</p>
+                <p><strong>Chi tiết quan trọng:</strong> Sử dụng <code>OffscreenCanvas</code> bên trong Worker vì chúng không thể truy cập DOM. <code>createImageBitmap()</code> hoạt động mượt mà trong Worker.</p>
+                <p><strong>Tăng tốc:</strong> <span class="badge badge-green">Nhanh hơn 4-8 lần</span> trên máy đa nhân. UI vẫn mượt mà tuyệt đối.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📊 3.2 Laplacian Variance — Chấm điểm Độ nét</div>
+                <p><strong>Cách hoạt động:</strong></p>
+                <ul>
+                    <li>Thu nhỏ ảnh về kích thước <strong>128×128</strong> (giảm số pixel đi 1400 lần)</li>
+                    <li>Chuyển sang ảnh xám (grayscale)</li>
+                    <li>Áp dụng ma trận Laplacian 3×3: <code>[0,1,0], [1,-4,1], [0,1,0]</code></li>
+                    <li>Tính <strong>phương sai (variance)</strong> của kết quả</li>
+                </ul>
+                <p>Phương sai cao = <strong>ảnh nét</strong>. Phương sai thấp = <strong>ảnh mờ</strong>.</p>
+                <p><strong>Ứng dụng:</strong> Trong mỗi nhóm ảnh tương tự, tự động chọn trước ảnh nét nhất làm "ảnh tốt nhất" — <strong>chi phí AI bằng 0</strong>.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📷 3.3 Phân tích EXIF — Nhóm theo Mốc thời gian</div>
+                <p><strong>Thư viện:</strong> <code>exifr</code> (~10KB gzipped). Đọc EXIF từ Blob/File trực tiếp.</p>
+                <p><strong>Cách hoạt động:</strong></p>
+                <ul>
+                    <li>Đọc <code>DateTimeOriginal</code> từ header EXIF (<strong>chỉ đọc vài KB đầu tiên</strong>, KHÔNG giải mã pixel)</li>
+                    <li>Sắp xếp ảnh theo thời gian chụp</li>
+                    <li>Nếu 2 ảnh liên tiếp cách nhau &lt; 2 giây → cùng một nhóm (chụp liên tục)</li>
+                </ul>
+                <p><strong>Tại sao EXIF trước, pHash sau?</strong> EXIF chỉ đọc file header (vài KB) = tức thời. pHash phải giải mã toàn bộ ảnh = chậm hơn nhiều. Quy trình tối ưu: <strong>EXIF (nhóm thô) → pHash (tinh chỉnh) → Laplacian (chấm điểm)</strong>.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🎨 3.4 Color Histogram — Nhận diện Cảnh</div>
+                <p><strong>Cách hoạt động:</strong> Thu nhỏ về 32×32, tính biểu đồ màu RGB (16 bin mỗi kênh = 48 giá trị tổng cộng). So sánh bằng khoảng cách Chi-Square hoặc Bhattacharyya.</p>
+                <p><strong>Ứng dụng:</strong> Hai bức ảnh cùng một cảnh chụp từ các góc khác nhau sẽ có giá trị pHash khác nhau nhưng biểu đồ màu tương tự — vẫn có thể được nhóm lại với nhau.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-title">💾 3.5 Quản lý Bộ nhớ Nghiêm ngặt (Bắt buộc cho 10k+)</div>
+                <p><strong>Chiến lược "Tải khi cần" (Load On Demand):</strong></p>
+                <ul>
+                    <li><strong>Khi khởi tạo:</strong> Chỉ đọc EXIF (vài KB/file). KHÔNG ObjectURL, KHÔNG giải mã ảnh.</li>
+                    <li><strong>Khi cuộn đến nhóm:</strong> Chỉ tạo ObjectURL cho các ảnh đang hiển thị + vùng đệm (overscan).</li>
+                    <li><strong>Khi cuộn đi:</strong> Gọi <code>URL.revokeObjectURL()</code> cho các ảnh rời khỏi khung nhìn (viewport).</li>
+                </ul>
+                <p>Chỉ giữ tối đa <strong>50-100 ObjectURL</strong> sống tại một thời điểm (thay vì 10.000). Sử dụng <strong>LRU Cache</strong> để quản lý ảnh thu nhỏ (thumbnail).</p>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🗂️ 3.6 Bộ nhớ đệm IndexedDB — Bỏ qua xử lý lại</div>
+                <p>Lưu trữ tất cả kết quả đã tính toán (hash, EXIF, điểm độ nét) vào IndexedDB với key = <code>fileName + fileSize + lastModified</code>.</p>
+                <ul>
+                    <li>Lần mở đầu tiên: Xử lý đầy đủ → lưu vào cache</li>
+                    <li>Lần mở thứ hai: Đọc từ cache → <strong>khởi động gần như tức thì</strong></li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- PIPELINE -->
+        <section class="section">
+            <h2><span class="icon">📐</span> Quy trình Xử lý Tối ưu</h2>
+            <div class="pipeline">
+                <div class="pipeline-step step-1">
+                    <div class="step-num">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Phân tích EXIF (chỉ header)</div>
+                        <div class="step-detail">Đọc mốc thời gian, sắp xếp theo trình tự, phát hiện chuỗi chụp liên tục. Không giải mã pixel.</div>
+                    </div>
+                    <div class="step-time">~1-2ms/file → 10-20s</div>
+                </div>
+                <div class="pipeline-step step-2">
+                    <div class="step-num">2</div>
+                    <div class="step-content">
+                        <div class="step-title">Tạo pHash (thu nhỏ về 8×8)</div>
+                        <div class="step-detail">Chạy trên Worker Pool (4 luồng). Tinh chỉnh các nhóm EXIF bằng cách tách các ảnh khác nhau về mặt thị giác.</div>
+                    </div>
+                    <div class="step-time">~5-10ms/file → 15-25s</div>
+                </div>
+                <div class="pipeline-step step-3">
+                    <div class="step-num">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Chấm điểm độ nét Laplacian (thu nhỏ về 128×128)</div>
+                        <div class="step-detail">Chạy trên Worker Pool. Chấm điểm từng ảnh. Chọn trước ảnh nét nhất mỗi nhóm.</div>
+                    </div>
+                    <div class="step-time">~10-15ms/file → 25-40s</div>
+                </div>
+                <div class="pipeline-step step-4">
+                    <div class="step-num">4</div>
+                    <div class="step-content">
+                        <div class="step-title">Hiển thị & Lazy Load</div>
+                        <div class="step-detail">Danh sách ảo (Virtualized list). Tạo ObjectURL khi cần. Lưu kết quả vào IndexedDB.</div>
+                    </div>
+                    <div class="step-time">Tức thì (chỉ vùng hiển thị)</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SUMMARY -->
+        <section class="summary-box">
+            <h2><span class="icon">🏁</span> Hiệu năng mong đợi (10.000 ảnh)</h2>
+            <div class="metric-row">
+                <div class="metric">
+                    <div class="metric-value">~90s</div>
+                    <div class="metric-label">Tổng thời gian xử lý</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">~300MB</div>
+                    <div class="metric-label">RAM đỉnh điểm</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">$0</div>
+                    <div class="metric-label">Chi phí API</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">60fps</div>
+                    <div class="metric-label">Độ mượt UI</div>
+                </div>
+            </div>
+            <p style="text-align: center; margin-top: 20px; color: var(--text-muted); font-size: 0.85rem;">
+                AI (Gemini) chỉ được gọi khi người dùng yêu cầu phân tích chi tiết cho một nhóm cụ thể — tiết kiệm chi phí API đáng kể.
+            </p>
+        </section>
+
+    </div>
+</body>
+</html>

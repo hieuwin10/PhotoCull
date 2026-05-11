@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nghiên cứu Chiến lược AI — PhotoCull AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #060a13;
+            --surface: rgba(15, 23, 42, 0.6);
+            --border: rgba(139, 92, 246, 0.08);
+            --border-bright: rgba(139, 92, 246, 0.25);
+            --text: #94a3b8;
+            --text-bright: #e2e8f0;
+            --text-muted: #475569;
+            --cyan: #22d3ee;
+            --blue: #3b82f6;
+            --purple: #a78bfa;
+            --green: #34d399;
+            --amber: #fbbf24;
+            --red: #f87171;
+            --pink: #f472b6;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+        .page { max-width: 920px; margin: 0 auto; padding: 40px 20px 80px; }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 50px 30px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(135deg, #a78bfa, #f472b6);
+        }
+        .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+        .badge-purple { background: linear-gradient(135deg, #8b5cf6, #ec4899); color: white; }
+        .badge-green { background: rgba(52, 211, 153, 0.15); color: var(--green); border: 1px solid rgba(52, 211, 153, 0.2); }
+        .badge-red { background: rgba(248, 113, 113, 0.15); color: var(--red); border: 1px solid rgba(248, 113, 113, 0.2); }
+        .badge-amber { background: rgba(251, 191, 36, 0.15); color: var(--amber); border: 1px solid rgba(251, 191, 36, 0.2); }
+        .badge-cyan { background: rgba(34, 211, 238, 0.15); color: var(--cyan); border: 1px solid rgba(34, 211, 238, 0.2); }
+
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+        }
+        .subtitle { font-size: 1.05rem; color: var(--text-muted); max-width: 650px; margin: 0 auto; }
+
+        h2 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-bright);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h3 { font-size: 1.1rem; font-weight: 700; color: var(--purple); margin: 16px 0 8px; }
+        p { margin-bottom: 12px; }
+        strong { color: var(--text-bright); }
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(139, 92, 246, 0.1);
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            color: var(--purple);
+        }
+        ul { padding-left: 20px; margin-bottom: 12px; }
+        li { margin-bottom: 6px; }
+
+        .section { margin-bottom: 40px; }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            transition: border-color 0.3s;
+        }
+        .card:hover { border-color: var(--border-bright); }
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text-bright);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 0.85rem;
+        }
+        th {
+            background: rgba(139, 92, 246, 0.08);
+            color: var(--text-bright);
+            font-weight: 700;
+            text-align: left;
+            padding: 10px 14px;
+            border-bottom: 2px solid rgba(139, 92, 246, 0.15);
+        }
+        td {
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+        /* Provider comparison */
+        .provider-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+        .provider-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        .provider-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+        }
+        .provider-ollama::before { background: linear-gradient(135deg, #34d399, #22d3ee); }
+        .provider-openrouter::before { background: linear-gradient(135deg, #3b82f6, #8b5cf6); }
+        .provider-gemini::before { background: linear-gradient(135deg, #fbbf24, #f87171); }
+        .provider-name { font-size: 1.1rem; font-weight: 800; color: var(--text-bright); margin-bottom: 6px; }
+        .provider-tag { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+        .provider-ollama .provider-tag { color: var(--green); }
+        .provider-openrouter .provider-tag { color: var(--blue); }
+        .provider-gemini .provider-tag { color: var(--amber); }
+        .pro-con { margin-top: 12px; }
+        .pro-con-item { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 6px; font-size: 0.85rem; }
+        .pro { color: var(--green); }
+        .con { color: var(--red); }
+
+        /* Flow chart */
+        .flow {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 0;
+        }
+        .flow-arrow {
+            text-align: center;
+            padding: 4px 0;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+        .flow-num {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+        .flow-1 { background: linear-gradient(135deg, #34d399, #22d3ee); color: #0f172a; }
+        .flow-2 { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; }
+        .flow-3 { background: linear-gradient(135deg, #fbbf24, #f87171); color: #0f172a; }
+        .flow-4 { background: linear-gradient(135deg, #94a3b8, #64748b); color: #0f172a; }
+        .flow-label { font-weight: 700; color: var(--text-bright); font-size: 0.9rem; }
+        .flow-desc { font-size: 0.8rem; color: var(--text-muted); }
+
+        /* Summary */
+        .summary-box {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(244, 114, 182, 0.08));
+            border: 1px solid rgba(139, 92, 246, 0.15);
+            border-radius: 16px;
+            padding: 28px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        .summary-box h2 {
+            justify-content: center;
+            background: linear-gradient(135deg, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <!-- HEADER -->
+    <header class="header">
+        <span class="badge badge-purple">Chiến lược Mô hình AI</span>
+        <h1>Nghiên cứu Nhà cung cấp AI</h1>
+        <p class="subtitle">Đánh giá Ollama (local), OpenRouter (cloud miễn phí) và kiến trúc hybrid để thay thế hoặc bổ sung cho Gemini trong việc phân tích ảnh.</p>
+    </header>
+
+    <!-- CURRENT STATE -->
+    <section class="section">
+        <h2>🔍 Trạng thái hiện tại: Phụ thuộc hoàn toàn vào Gemini</h2>
+        <p>Dự án hiện đang sử dụng <strong>8 hàm AI</strong> trong <code>geminiService.ts</code>, tất cả đều được vận hành bởi <strong>Gemini 2.5 Flash</strong>. Mỗi hàm đều yêu cầu <strong>khả năng xử lý hình ảnh (vision)</strong>.</p>
+        <table>
+            <thead>
+                <tr><th>Hàm</th><th>Model</th><th>Mục đích</th><th>Có thể thay thế?</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>analyzeImageGroup</code></td><td>Flash</td><td>Chọn ảnh tốt nhất</td><td><span class="badge badge-green">Có</span></td></tr>
+                <tr><td><code>refineImageGroup</code></td><td>Flash</td><td>Tách các nhóm không khớp</td><td><span class="badge badge-green">Có</span></td></tr>
+                <tr><td><code>mergeSimilarGroups</code></td><td>Flash</td><td>Gộp các nhóm bị chia nhỏ</td><td><span class="badge badge-green">Có</span></td></tr>
+                <tr><td><code>distributeImages</code></td><td>Flash</td><td>Di chuyển ảnh giữa các nhóm</td><td><span class="badge badge-green">Có</span></td></tr>
+                <tr><td><code>getEditSuggestions</code></td><td>Flash</td><td>Gợi ý chỉnh sửa</td><td><span class="badge badge-green">Có</span></td></tr>
+                <tr><td><code>generateEnhancedImage</code></td><td>Flash Image</td><td>Chỉnh sửa ảnh bằng AI</td><td><span class="badge badge-red">Không (Tạo ảnh)</span></td></tr>
+                <tr><td><code>generateImageVariations</code></td><td>Flash Image</td><td>Tạo biến thể phong cách</td><td><span class="badge badge-red">Không (Tạo ảnh)</span></td></tr>
+                <tr><td><code>generateImprovementReport</code></td><td>Flash</td><td>So sánh trước/sau</td><td><span class="badge badge-green">Có</span></td></tr>
+            </tbody>
+        </table>
+        <p><strong>Nhận xét quan trọng:</strong> 6 trên 8 hàm là các tác vụ vision có đầu ra dạng văn bản — hoàn toàn có thể thay thế bằng các model local hoặc miễn phí. Chỉ có 2 hàm yêu cầu **tạo hình ảnh**, đây vẫn là độc quyền của Gemini.</p>
+    </section>
+
+    <!-- PROVIDERS -->
+    <section class="section">
+        <h2>⚡ So sánh các Nhà cung cấp</h2>
+        <div class="provider-grid">
+
+            <div class="provider-card provider-ollama">
+                <div class="provider-name">🖥️ Ollama (Local)</div>
+                <div class="provider-tag">Ưu tiên 1 — Hoàn toàn Ngoại tuyến</div>
+                <p style="font-size: 0.85rem;">Chạy các model vision tại máy cục bộ. Đề xuất: <code>llama3.2-vision</code> (11B) hoặc <code>moondream</code> (1.6B) cho phần cứng cấu hình thấp.</p>
+                <div class="pro-con">
+                    <div class="pro-con-item"><span class="pro">✅</span> Không tốn chi phí, không giới hạn request</div>
+                    <div class="pro-con-item"><span class="pro">✅</span> Ảnh không bao giờ rời khỏi máy</div>
+                    <div class="pro-con-item"><span class="pro">✅</span> Hoạt động ngoại tuyến</div>
+                    <div class="pro-con-item"><span class="con">❌</span> Cần GPU mạnh (4-16GB VRAM)</div>
+                    <div class="pro-con-item"><span class="con">❌</span> Không thể tạo ảnh</div>
+                </div>
+            </div>
+
+            <div class="provider-card provider-openrouter">
+                <div class="provider-name">🌐 OpenRouter (Cloud miễn phí)</div>
+                <div class="provider-tag">Ưu tiên 2 — API Miễn phí</div>
+                <p style="font-size: 0.85rem;">Các model vision miễn phí: <code>gemma-4-26b</code>, <code>gemma-4-31b</code>, <code>nemotron-nano-12b-vl</code>. API tương thích với OpenAI.</p>
+                <div class="pro-con">
+                    <div class="pro-con-item"><span class="pro">✅</span> Miễn phí, không cần GPU</div>
+                    <div class="pro-con-item"><span class="pro">✅</span> Chất lượng cao (Gemma 4 ≈ Gemini Flash)</div>
+                    <div class="pro-con-item"><span class="pro">✅</span> API tương thích với OpenAI</div>
+                    <div class="pro-con-item"><span class="con">❌</span> Bị giới hạn tần suất (Rate limit)</div>
+                    <div class="pro-con-item"><span class="con">❌</span> Không thể tạo ảnh</div>
+                </div>
+            </div>
+
+            <div class="provider-card provider-gemini">
+                <div class="provider-name">✨ Gemini (Hiện tại)</div>
+                <div class="provider-tag">Ưu tiên 3 — Dự phòng Cao cấp</div>
+                <p style="font-size: 0.85rem;">Nhà cung cấp hiện tại. <code>gemini-2.5-flash</code> cho phân tích, <code>gemini-2.5-flash-image</code> cho việc tạo ảnh.</p>
+                <div class="pro-con">
+                    <div class="pro-con-item"><span class="pro">✅</span> Phân tích chất lượng cao nhất</div>
+                    <div class="pro-con-item"><span class="pro">✅</span> Nhà cung cấp duy nhất có khả năng tạo ảnh</div>
+                    <div class="pro-con-item"><span class="con">❌</span> Giới hạn (15 RPM miễn phí)</div>
+                    <div class="pro-con-item"><span class="con">❌</span> Cần internet + API key</div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- HYBRID STRATEGY -->
+    <section class="section">
+        <h2>🔧 Đề xuất: Kiến trúc Đa nhà cung cấp Lai (Hybrid Multi-Provider)</h2>
+        <p>Thiết kế một **Lớp trừu tượng hóa Nhà cung cấp AI** để ứng dụng tự động chọn nhà cung cấp tốt nhất hiện có:</p>
+        <div class="flow">
+            <div class="flow-step">
+                <div class="flow-num flow-1">1</div>
+                <div>
+                    <div class="flow-label">Ollama Local</div>
+                    <div class="flow-desc">Kiểm tra xem Ollama có đang chạy tại localhost:11434 không. Nếu có, sử dụng nó.</div>
+                </div>
+            </div>
+            <div class="flow-arrow">↓ <span style="font-size: 0.7rem;">nếu không có sẵn</span></div>
+            <div class="flow-step">
+                <div class="flow-num flow-2">2</div>
+                <div>
+                    <div class="flow-label">OpenRouter Miễn phí</div>
+                    <div class="flow-desc">Sử dụng Gemma 4 hoặc Nemotron qua API miễn phí. Yêu cầu API key.</div>
+                </div>
+            </div>
+            <div class="flow-arrow">↓ <span style="font-size: 0.7rem;">nếu bị rate limit</span></div>
+            <div class="flow-step">
+                <div class="flow-num flow-3">3</div>
+                <div>
+                    <div class="flow-label">Gemini Gói Miễn phí</div>
+                    <div class="flow-desc">Sử dụng API key của chính người dùng. Cũng được sử dụng độc quyền cho việc tạo ảnh.</div>
+                </div>
+            </div>
+            <div class="flow-arrow">↓ <span style="font-size: 0.7rem;">nếu hết hạn mức</span></div>
+            <div class="flow-step">
+                <div class="flow-num flow-4">4</div>
+                <div>
+                    <div class="flow-label">Groq / Các gói miễn phí khác</div>
+                    <div class="flow-desc">Các nhà cung cấp dự phòng bổ sung để tăng tính bền bỉ.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- IMAGE GENERATION -->
+    <section class="section">
+        <h2>🎨 Chiến lược Tạo ảnh</h2>
+        <div class="card">
+            <div class="card-title">Vấn đề Tạo ảnh</div>
+            <p>Cả Ollama và các model miễn phí của OpenRouter đều không thể **tạo/chỉnh sửa ảnh**. Chỉ có Gemini Flash Image làm được việc này. Đối với người dùng không có key Gemini, chúng ta cần một phương án dự phòng:</p>
+            <ul>
+                <li><strong>Bộ lọc CSS dựa trên Canvas</strong>: Áp dụng các điều chỉnh độ sáng, độ tương phản, độ bão hòa, độ ấm qua HTML5 Canvas — tức thời, chi phí bằng 0.</li>
+                <li><strong>LUT (Bảng tra cứu) cài đặt sẵn</strong>: Các profile màu được xây dựng sẵn (Cinematic, Vintage, B&W) áp dụng qua thao tác pixel trên Canvas.</li>
+                <li><strong>Shaders WebGL</strong>: Các hiệu ứng nâng cao như tối góc (vignette), hạt (grain) và tone mapping sử dụng shaders tăng tốc bằng GPU.</li>
+            </ul>
+            <p>Điều này mang lại một "giải pháp 80%" tốt cho việc chỉnh sửa ảnh mà không phụ thuộc vào AI.</p>
+        </div>
+    </section>
+
+    <!-- HARDWARE TABLE -->
+    <section class="section">
+        <h2>💻 Yêu cầu Phần cứng cho Ollama</h2>
+        <table>
+            <thead>
+                <tr><th>Model</th><th>VRAM</th><th>RAM</th><th>Tốc độ/ảnh</th><th>Chất lượng</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>moondream</code> (1.6B)</td><td>2-3 GB</td><td>4 GB</td><td>2-5s</td><td>⭐⭐ Cơ bản</td></tr>
+                <tr><td><code>llama3.2-vision</code> (11B)</td><td>8-10 GB</td><td>12 GB</td><td>5-15s</td><td>⭐⭐⭐ Tốt</td></tr>
+                <tr><td><code>qwen2.5-vl</code> (7B)</td><td>6-8 GB</td><td>10 GB</td><td>5-10s</td><td>⭐⭐⭐ Tốt</td></tr>
+                <tr><td><code>gemma-4-26b</code></td><td>16+ GB</td><td>24 GB</td><td>10-30s</td><td>⭐⭐⭐⭐ Tuyệt vời</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- SUMMARY -->
+    <section class="summary-box">
+        <h2>🏁 Tóm tắt Chiến lược</h2>
+        <p style="max-width: 600px; margin: 16px auto; color: var(--text);">
+            Xây dựng một **Lớp trừu tượng hóa Nhà cung cấp** tự động phát hiện Ollama, dự phòng sang OpenRouter miễn phí, sau đó là Gemini. 
+            Đối với việc tạo ảnh, sử dụng Gemini khi có sẵn, dùng bộ lọc Canvas làm dự phòng. 
+            Điều này mang lại cho người dùng **sự linh hoạt tối đa** với **chi phí bắt buộc bằng 0**.
+        </p>
+    </section>
+
+</div>
+</body>
+</html>

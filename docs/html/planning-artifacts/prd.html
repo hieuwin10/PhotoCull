@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhotoCull AI - Yêu Cầu Sản Phẩm (PRD)</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #e2e8f0;
+            --accent-color: #10b981;
+            --accent-gradient: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            width: 90%;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            margin: 40px 0;
+        }
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        h2 {
+            font-size: 1.5rem;
+            color: #f8fafc;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-top: 30px;
+        }
+        p, li {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #94a3b8;
+        }
+        strong {
+            color: #f8fafc;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: var(--accent-gradient);
+            color: white;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="text-align: center;">
+            <span class="badge">Kế hoạch Chính thức</span>
+        </div>
+        <h1>PhotoCull AI - Yêu Cầu Sản Phẩm</h1>
+        
+        <h2>1. Tầm nhìn & Mục tiêu</h2>
+        <p>PhotoCull AI hướng tới trở thành công cụ tối thượng cho các nhiếp ảnh gia để nhanh chóng phân loại, lọc bỏ (cull) và cải thiện hình ảnh của họ bằng AI.</p>
+
+        <h2>2. Đối tượng Người dùng</h2>
+        <ul>
+            <li><strong>Người lọc ảnh siêu tốc (The Speed Culler)</strong>: Cần xử lý hàng ngàn bức ảnh chụp nhanh chóng.</li>
+            <li><strong>Người chỉnh sửa chi tiết (The Detail Editor)</strong>: Tìm kiếm các chi tiết nhỏ và dựa vào AI để kiểm tra chất lượng.</li>
+        </ul>
+
+        <h2>3. Tính năng Đề xuất</h2>
+        <ul>
+            <li><strong>Tự động lưu/Duy trì trạng thái</strong>: Lưu trạng thái dự án vào IndexedDB.</li>
+            <li><strong>So sánh song song</strong>: Chế độ xem chia đôi màn hình trong modal (Split View).</li>
+            <li><strong>Prompts AI tùy chỉnh</strong>: Lưu và tải các prompts tùy chỉnh.</li>
+        </ul>
+
+        <h2>4. Kế hoạch Kiến trúc</h2>
+        <ul>
+            <li>Tách nhỏ <code>App.tsx</code> thành các component nhỏ hơn.</li>
+            <li>Sử dụng Zustand để quản lý trạng thái (State Management).</li>
+        </ul>
+    </div>
+</body>
+</html>

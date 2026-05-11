@@ -1,0 +1,6 @@
+{
+  "name": "Copy of PhotoCull AI",
+  "description": "Smart photo culling application that groups similar photos and uses Gemini AI to select the best shots from large collections.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

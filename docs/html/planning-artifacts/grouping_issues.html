@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phân tích Vấn đề Nhóm ảnh — PhotoCull AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #060a13;
+            --surface: rgba(15, 23, 42, 0.6);
+            --border: rgba(251, 191, 36, 0.08);
+            --border-bright: rgba(251, 191, 36, 0.25);
+            --text: #94a3b8;
+            --text-bright: #e2e8f0;
+            --text-muted: #475569;
+            --cyan: #22d3ee;
+            --green: #34d399;
+            --amber: #fbbf24;
+            --red: #f87171;
+            --purple: #a78bfa;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+        .page { max-width: 920px; margin: 0 auto; padding: 40px 20px 80px; }
+        .header { text-align: center; margin-bottom: 50px; padding: 50px 30px; background: var(--surface); border: 1px solid var(--border); border-radius: 24px; position: relative; overflow: hidden; }
+        .header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(135deg, #f59e0b, #ef4444); }
+        .badge { display: inline-block; padding: 6px 16px; border-radius: 9999px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 16px; }
+        .badge-amber { background: linear-gradient(135deg, #f59e0b, #ef4444); color: #0f172a; }
+        h1 { font-size: 2.2rem; font-weight: 900; background: linear-gradient(135deg, #f59e0b, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 12px; }
+        .subtitle { font-size: 1rem; color: var(--text-muted); max-width: 650px; margin: 0 auto; }
+        h2 { font-size: 1.4rem; font-weight: 800; color: var(--text-bright); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+        p { margin-bottom: 12px; }
+        strong { color: var(--text-bright); }
+        code { font-family: 'JetBrains Mono', monospace; background: rgba(251, 191, 36, 0.1); padding: 2px 7px; border-radius: 4px; font-size: 0.85em; color: var(--amber); }
+        ul { padding-left: 20px; margin-bottom: 12px; }
+        li { margin-bottom: 6px; }
+        .section { margin-bottom: 40px; }
+
+        .issue-card { background: var(--surface); border-radius: 16px; padding: 24px; margin-bottom: 16px; position: relative; overflow: hidden; }
+        .issue-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
+        .issue-critical::before { background: var(--red); }
+        .issue-important::before { background: var(--amber); }
+        .issue-minor::before { background: var(--green); }
+        .issue-critical { border: 1px solid rgba(248, 113, 113, 0.15); }
+        .issue-important { border: 1px solid rgba(251, 191, 36, 0.1); }
+        .issue-minor { border: 1px solid rgba(34, 211, 153, 0.1); }
+
+        .issue-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .severity { font-size: 0.7rem; font-weight: 800; padding: 3px 10px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .sev-critical { background: rgba(248, 113, 113, 0.15); color: var(--red); }
+        .sev-important { background: rgba(251, 191, 36, 0.15); color: var(--amber); }
+        .sev-minor { background: rgba(34, 211, 153, 0.15); color: var(--green); }
+        .issue-title { font-size: 1.1rem; font-weight: 800; color: var(--text-bright); }
+        .issue-file { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; }
+
+        pre { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; padding: 16px; overflow-x: auto; color: var(--cyan); margin: 12px 0; }
+        .fix-box { background: rgba(34, 211, 153, 0.06); border: 1px solid rgba(34, 211, 153, 0.15); border-radius: 10px; padding: 14px 18px; margin-top: 10px; }
+        .fix-box strong { color: var(--green); }
+
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.82rem; }
+        th { background: rgba(251, 191, 36, 0.08); color: var(--text-bright); font-weight: 700; text-align: left; padding: 10px 14px; border-bottom: 2px solid rgba(251, 191, 36, 0.15); }
+        td { padding: 10px 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.04); }
+        tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+        .summary-box { background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), rgba(239, 68, 68, 0.08)); border: 1px solid rgba(251, 191, 36, 0.15); border-radius: 16px; padding: 28px; margin-top: 30px; }
+        .summary-box h2 { justify-content: center; background: linear-gradient(135deg, #f59e0b, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
+</head>
+<body>
+<div class="page">
+
+    <header class="header">
+        <span class="badge badge-amber">Báo cáo Kiểm toán Mã nguồn</span>
+        <h1>Các Vấn đề Nhóm ảnh</h1>
+        <p class="subtitle">Phân tích toàn diện các điểm yếu trong hệ thống nhóm ảnh hiện tại, với đánh giá mức độ nghiêm trọng và các giải pháp đề xuất.</p>
+    </header>
+
+    <!-- VẤN ĐỀ NGHIÊM TRỌNG -->
+    <section class="section">
+        <h2>🔴 Vấn đề Nghiêm trọng</h2>
+
+        <div class="issue-card issue-critical">
+            <div class="issue-header">
+                <span class="severity sev-critical">Nghiêm trọng</span>
+                <span class="issue-title">So sánh chuỗi chỉ kiểm tra các file liền kề</span>
+            </div>
+            <div class="issue-file">📁 imageUtils.ts : Dòng 228-244</div>
+            <p>Thuật toán nhóm ảnh chỉ so sánh từng ảnh với <strong>ảnh trước đó</strong> trong danh sách. Hai ảnh giống nhau nhưng nằm xa nhau sẽ <strong>không bao giờ được nhóm lại với nhau</strong>.</p>
+            <pre>// Hiện tại: Chỉ so sánh img[i] với img[i-1]
+for (let i = 1; i < validImages.length; i++) {
+    const distance = getHammingDistance(current.hash, prev.hash);
+    if (distance <= THRESHOLD) { /* cùng nhóm */ }
+}</pre>
+            <p><strong>Ví dụ thực tế:</strong> IMG_001 (Cảnh A), IMG_002 (Cảnh B), IMG_003 (Cảnh A) → IMG_003 sẽ KHÔNG được nhóm với IMG_001.</p>
+            <div class="fix-box">
+                <strong>Giải pháp:</strong> Thêm một lượt "cứu hộ ảnh lạc" sau khi so sánh chuỗi. Các nhóm chỉ có một ảnh nên được so sánh với TẤT CẢ các nhóm khác để tìm kết quả khớp nhất.
+            </div>
+        </div>
+
+        <div class="issue-card issue-critical">
+            <div class="issue-header">
+                <span class="severity sev-critical">Nghiêm trọng</span>
+                <span class="issue-title">File không được sắp xếp trước khi nhóm</span>
+            </div>
+            <div class="issue-file">📁 useProjectManager.ts : Dòng 260</div>
+            <p>Mảng <code>File[]</code> từ bộ chọn file của trình duyệt <strong>không đảm bảo thứ tự</strong>. Vì So sánh chuỗi phụ thuộc vào thứ tự, các file không được sắp xếp sẽ gây ra <strong>nhóm sai nghiêm trọng</strong>.</p>
+            <div class="fix-box">
+                <strong>Giải pháp:</strong> Sắp xếp các file theo <code>file.name</code> (hoặc dấu thời gian EXIF) trước khi chuyển sang <code>groupSimilarImages()</code>.
+            </div>
+        </div>
+    </section>
+
+    <!-- VẤN ĐỀ QUAN TRỌNG -->
+    <section class="section">
+        <h2>🟡 Vấn đề Quan trọng</h2>
+
+        <div class="issue-card issue-important">
+            <div class="issue-header">
+                <span class="severity sev-important">Quan trọng</span>
+                <span class="issue-title">Không phân tích cú pháp thời gian EXIF</span>
+            </div>
+            <p>Hệ thống chỉ dựa vào pHash để nhóm. <strong>EXIF DateTimeOriginal</strong> không bao giờ được đọc, bỏ lỡ thông tin quan trọng để phát hiện chụp liên tục và sắp xếp theo thời gian thực.</p>
+            <div class="fix-box"><strong>Giải pháp:</strong> Thêm thư viện <code>exifr</code>. Sử dụng dấu thời gian EXIF làm tín hiệu nhóm chính, pHash làm tín hiệu phụ.</div>
+        </div>
+
+        <div class="issue-card issue-important">
+            <div class="issue-header">
+                <span class="severity sev-important">Quan trọng</span>
+                <span class="issue-title">Ngưỡng cố định (12/64)</span>
+            </div>
+            <p>Ngưỡng khoảng cách Hamming được mã hóa cứng ở mức 12. Điều này có thể <strong>quá lỏng đối với ảnh chân dung</strong> (nhiều người khác nhau bị nhóm lại) hoặc <strong>quá chặt đối với ảnh phong cảnh</strong> (cùng một cảnh từ các góc khác nhau bị tách ra).</p>
+            <div class="fix-box"><strong>Giải pháp:</strong> Cho phép người dùng điều chỉnh thông qua thanh trượt UI, hoặc triển khai ngưỡng thích ứng dựa trên đặc điểm của tập dữ liệu.</div>
+        </div>
+
+        <div class="issue-card issue-important">
+            <div class="issue-header">
+                <span class="severity sev-important">Quan trọng</span>
+                <span class="issue-title">Không phát hiện trùng lặp</span>
+            </div>
+            <p>Nếu người dùng kéo cùng một thư mục hai lần, tất cả các ảnh sẽ bị trùng lặp mà không có cảnh báo.</p>
+            <div class="fix-box"><strong>Giải pháp:</strong> Kiểm tra pHash + fileName trước khi thêm. Cảnh báo người dùng nếu tìm thấy trùng lặp.</div>
+        </div>
+
+        <div class="issue-card issue-important">
+            <div class="issue-header">
+                <span class="severity sev-important">Quan trọng</span>
+                <span class="issue-title">Rò rỉ bộ nhớ khi Xóa/Thùng rác</span>
+            </div>
+            <div class="issue-file">📁 useImageGroups.ts : Dòng 160-196</div>
+            <p>Khi ảnh được xóa vào Thùng rác, các <code>ObjectURL</code> của chúng (previewUrl, thumbnailUrl) <strong>không bao giờ được thu hồi</strong>. Mỗi URL giữ một tham chiếu ngăn chặn việc dọn rác (garbage collection). Với 10k ảnh, điều này làm rò rỉ hàng GB RAM.</p>
+            <div class="fix-box"><strong>Giải pháp:</strong> Gọi <code>URL.revokeObjectURL()</code> khi di chuyển vào thùng rác và khi làm trống thùng rác.</div>
+        </div>
+
+        <div class="issue-card issue-important">
+            <div class="issue-header">
+                <span class="severity sev-important">Quan trọng</span>
+                <span class="issue-title">Gộp không đặt lại trạng thái phân tích</span>
+            </div>
+            <div class="issue-file">📁 useImageGroups.ts : Dòng 106-129</div>
+            <p>Gộp hai nhóm đã phân tích sẽ giữ lại <code>selectionReason</code> chỉ từ nhóm đầu tiên và tham gia <code>bestImageIds</code>. Phân tích AI trở nên <strong>không hợp lệ</strong> đối với nhóm được gộp.</p>
+            <div class="fix-box"><strong>Giải pháp:</strong> Đặt lại <code>status</code> thành <code>'pending'</code>, xóa <code>selectionReason/rejectionReason</code> khi gộp.</div>
+        </div>
+    </section>
+
+    <!-- VẤN ĐỀ NHỎ -->
+    <section class="section">
+        <h2>🟢 Vấn đề Nhỏ</h2>
+
+        <div class="issue-card issue-minor">
+            <div class="issue-header">
+                <span class="severity sev-minor">Nhỏ</span>
+                <span class="issue-title">Nhóm trống sau khi di chuyển</span>
+            </div>
+            <p><code>handleMoveImage</code> không kiểm tra xem nhóm nguồn có bị trống hay không. <code>handleDeleteImage</code> có kiểm tra này, nhưng Di chuyển thì không — hành vi không nhất quán.</p>
+        </div>
+
+        <div class="issue-card issue-minor">
+            <div class="issue-header">
+                <span class="severity sev-minor">Nhỏ</span>
+                <span class="issue-title">Sắp xếp dùng lastModified thay vì thời gian EXIF</span>
+            </div>
+            <p><code>file.lastModified</code> phản ánh thời gian sửa đổi của hệ thống tệp, KHÔNG PHẢI thời gian chụp. Các file được sao chép/di chuyển sẽ sắp xếp sai.</p>
+        </div>
+    </section>
+
+    <!-- THUẬT TOÁN ĐỀ XUẤT -->
+    <section class="section">
+        <h2>🚀 Đề xuất: Thuật toán Nhóm ảnh Đa lượt</h2>
+        <table>
+            <thead><tr><th>Lượt</th><th>Hành động</th><th>Độ phức tạp</th><th>Mục đích</th></tr></thead>
+            <tbody>
+                <tr><td><strong>1</strong></td><td>Sắp xếp file theo tên / thời gian EXIF</td><td>O(n log n)</td><td>Đảm bảo thứ tự thời gian</td></tr>
+                <tr><td><strong>2</strong></td><td>So sánh chuỗi với pHash</td><td>O(n)</td><td>Nhóm thô nhanh chóng</td></tr>
+                <tr><td><strong>3</strong></td><td>Cứu hộ ảnh lạc: So sánh các nhóm 1 ảnh với tất cả các nhóm</td><td>O(k × m)</td><td>Bắt các ảnh bị đặt sai chỗ</td></tr>
+                <tr><td><strong>4</strong></td><td>Điểm số Laplacian cho mỗi nhóm</td><td>O(n)</td><td>Chọn trước ảnh nét nhất</td></tr>
+            </tbody>
+        </table>
+        <p>Điều này giữ nguyên tốc độ O(n) cho hầu hết các ảnh (Lượt 2) trong khi thêm Lượt 3 để xử lý khoảng 5-10% ảnh "lạc" mà So sánh chuỗi bỏ sót.</p>
+    </section>
+
+    <!-- TÓM TẮT -->
+    <section class="summary-box">
+        <h2>📋 Tóm tắt Vấn đề</h2>
+        <p style="text-align: center; margin-bottom: 16px;">Phát hiện <strong>9 vấn đề</strong>: 2 Nghiêm trọng, 5 Quan trọng, 2 Nhỏ</p>
+        <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem;">Hai vấn đề nghiêm trọng (So sánh chuỗi + File không được sắp xếp) trực tiếp gây ra kết quả nhóm không chính xác và nên là những sửa đổi được <strong>ưu tiên cao nhất</strong> trước khi mở rộng quy mô lên hơn 10.000 ảnh.</p>
+    </section>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,84 @@
+/* ==========================================================================
+   PhotoCull Theme & Glassmorphism System
+   ========================================================================== */
+
+:root {
+  /* Default: Dark Mode (Midnight Deep) */
+  --bg-primary: #060a13;
+  --bg-secondary: rgba(15, 23, 42, 0.6);
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --accent-color: #22d3ee; /* Cyan */
+  --border-color: rgba(255, 255, 255, 0.05);
+  --card-bg: rgba(30, 41, 59, 0.3);
+}
+
+.light-mode {
+  /* Light Mode (Pure Studio) */
+  --bg-primary: #f8f9fa;
+  --bg-secondary: rgba(255, 255, 255, 0.8);
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --accent-color: #0284c7; /* Darker Cyan/Blue */
+  --border-color: rgba(0, 0, 0, 0.05);
+  --card-bg: rgba(255, 255, 255, 0.9);
+}
+
+/* Base resets or globals if needed */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Neo-Glassmorphism Utilities */
+.glass-panel {
+  background: var(--bg-secondary);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.glass-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  border-color: rgba(34, 211, 153, 0.2); /* Slight green glow on hover */
+}
+
+/* Micro-interactions */
+.btn-haptic {
+  transition: transform 0.1s ease, background-color 0.2s ease;
+}
+
+.btn-haptic:active {
+  transform: scale(0.95);
+}
+
+/* Custom Scrollbar for Filmstrip */
+.custom-scrollbar::-webkit-scrollbar {
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-color);
+}

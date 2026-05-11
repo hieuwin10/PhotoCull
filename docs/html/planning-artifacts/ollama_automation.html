@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chiến lược Tự động hóa Ollama — PhotoCull Phase 2</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#060a13;--s:rgba(15,23,42,.6);--t:#94a3b8;--tb:#e2e8f0;--red:#f87171;--amb:#fbbf24;--grn:#34d399;--cyan:#22d3ee;--pur:#a78bfa;--blue:#60a5fa}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t);line-height:1.7}
+.p{max-width:900px;margin:0 auto;padding:40px 20px 80px}
+.hd{text-align:center;padding:50px 30px;background:var(--s);border:1px solid rgba(34,211,153,.1);border-radius:24px;margin-bottom:40px;position:relative;overflow:hidden}
+.hd::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(135deg,#34d399,#22d3ee)}
+h1{font-size:2rem;font-weight:900;background:linear-gradient(135deg,#34d399,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.badge{display:inline-block;padding:5px 14px;border-radius:99px;font-size:.65rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;background:linear-gradient(135deg,#34d399,#22d3ee);color:#0f172a;margin-bottom:12px}
+h2{font-size:1.3rem;font-weight:800;color:var(--tb);margin:36px 0 16px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.05)}
+h3{font-size:1rem;font-weight:700;color:var(--cyan);margin:20px 0 10px}
+p,.li{margin-bottom:10px;font-size:.88rem}
+code{font-family:'JetBrains Mono',monospace;background:rgba(34,211,153,.08);padding:1px 5px;border-radius:3px;font-size:.82em;color:var(--grn)}
+pre{background:rgba(15,23,42,.8);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:16px;overflow-x:auto;margin:12px 0;font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--tb);line-height:1.6}
+.flow{background:var(--s);border:1px solid rgba(34,211,153,.1);border-radius:16px;padding:24px;margin:20px 0}
+.step{display:flex;gap:16px;align-items:flex-start;padding:16px;margin:8px 0;background:rgba(0,0,0,.2);border-radius:12px;border-left:3px solid var(--grn)}
+.step .num{background:var(--grn);color:#0f172a;font-weight:900;font-size:.8rem;min-width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step h4{font-size:.9rem;font-weight:700;color:var(--tb);margin-bottom:4px}
+.step p{font-size:.8rem;margin:0;color:var(--t)}
+table{width:100%;border-collapse:collapse;font-size:.8rem;margin:12px 0}
+th{background:rgba(34,211,153,.06);color:var(--tb);font-weight:700;text-align:left;padding:8px 10px;border-bottom:2px solid rgba(34,211,153,.12)}
+td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.03)}
+tr:hover td{background:rgba(255,255,255,.02)}
+.warn{background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.15);border-radius:12px;padding:16px;margin:16px 0;font-size:.85rem}
+.warn strong{color:var(--amb)}
+.card{background:var(--s);border:1px solid rgba(255,255,255,.05);border-radius:16px;padding:20px;margin:12px 0}
+.wizard{background:rgba(34,211,153,.04);border:2px dashed rgba(34,211,153,.2);border-radius:16px;padding:24px;margin:20px 0;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--tb);line-height:1.8;white-space:pre}
+</style>
+</head>
+<body>
+<div class="p">
+
+<header class="hd">
+<span class="badge">Chiến lược Phase 2</span>
+<h1>🤖 Tự động hóa hoàn toàn Ollama</h1>
+<p style="color:#475569;max-width:500px;margin:0 auto;font-size:.9rem">Người dùng chỉ cần: Cài đặt Ollama + có file .gguf.<br>Ứng dụng sẽ tự động xử lý mọi việc còn lại.</p>
+</header>
+
+<!-- FLOW -->
+<h2>1. Quy trình thiết lập tự động</h2>
+<div class="flow">
+<div class="step"><div class="num">1</div><div><h4>Tự động phát hiện Ollama</h4><p>Ping <code>GET localhost:11434/api/tags</code> với timeout 3 giây. Nếu OK → Ollama đang chạy. Nếu thất bại → hiển thị hướng dẫn cài đặt.</p></div></div>
+<div class="step"><div class="num">2</div><div><h4>Kiểm tra các Model Vision hiện có</h4><p>Lọc danh sách model theo các từ khóa vision đã biết: <code>llava, vision, minicpm-v, moondream, qwen2.5-vl, granite-vision</code>. Nếu tìm thấy → sử dụng trực tiếp, bỏ qua bước 3.</p></div></div>
+<div class="step"><div class="num">3</div><div><h4>Tự động Import file .gguf</h4><p>Hiển thị trình hướng dẫn (wizard) → Người dùng chọn file .gguf qua trình duyệt file → Ứng dụng tính toán SHA256 (streaming, không gây tràn bộ nhớ OOM) → Tải blob lên Ollama → Tạo model qua API. Hiển thị thanh tiến trình đầy đủ.</p></div></div>
+<div class="step"><div class="num">4</div><div><h4>Kiểm tra & Lưu cấu hình</h4><p>Gửi prompt thử nghiệm để xác minh model hoạt động → Lưu tên model vào <code>localStorage</code> → Lần sau mở ứng dụng sẽ tự động sử dụng model đã lưu.</p></div></div>
+</div>
+
+<!-- TECHNICAL DETAIL -->
+<h2>2. Các thách thức kỹ thuật cốt lõi</h2>
+
+<h3>2.1 Streaming SHA256 (Cho file dung lượng lớn tới 30GB)</h3>
+<div class="card">
+<p><strong>Vấn đề:</strong> <code>file.arrayBuffer()</code> tải toàn bộ file vào RAM → file 30GB = sập tab ngay lập tức.</p>
+<p><strong>Giải pháp:</strong> Sử dụng thư viện <code>hash-wasm</code> (dựa trên WebAssembly) để hash file theo từng khối 64MB.</p>
+<pre>const { createSHA256 } = await import('hash-wasm');
+const hasher = await createSHA256();
+hasher.init();
+
+const CHUNK = 64 * 1024 * 1024; // 64MB
+for (let i = 0; i &lt; Math.ceil(file.size / CHUNK); i++) {
+  const slice = await file.slice(i*CHUNK, (i+1)*CHUNK).arrayBuffer();
+  hasher.update(new Uint8Array(slice));
+  onProgress((i+1) / totalChunks * 100);
+}
+return hasher.digest('hex');</pre>
+</div>
+
+<h3>2.2 Tải lên với thanh tiến trình</h3>
+<div class="card">
+<p>Sử dụng <code>XMLHttpRequest</code> thay vì <code>fetch</code> để theo dõi tiến trình tải lên:</p>
+<pre>const xhr = new XMLHttpRequest();
+xhr.open('POST', `${OLLAMA}/api/blobs/sha256:${digest}`);
+xhr.upload.onprogress = (e) =&gt; onProgress(e.loaded/e.total*100);
+xhr.send(file); // Stream trực tiếp, không copy bộ nhớ</pre>
+<p style="color:var(--grn)">✅ Ollama cũng hỗ trợ kiểm tra HEAD để bỏ qua việc tải lên lại nếu blob đã tồn tại.</p>
+</div>
+
+<h3>2.3 Cấu hình CORS</h3>
+<div class="warn">
+<strong>⚠️ Trình duyệt chặn các yêu cầu đến localhost:11434 theo mặc định.</strong><br><br>
+PhotoCull sẽ tự động phát hiện lỗi CORS và hiển thị cách sửa 1-click:<br>
+<code>setx OLLAMA_ORIGINS "*"</code> → khởi động lại Ollama → xong vĩnh viễn.
+</div>
+
+<!-- MODELS TABLE -->
+<h2>3. Các Model Vision được đề xuất</h2>
+<table>
+<thead><tr><th>Model</th><th>RAM</th><th>Tốc độ</th><th>Chất lượng</th><th>Phù hợp nhất</th></tr></thead>
+<tbody>
+<tr><td><strong>moondream</strong> (1.8B)</td><td>2GB</td><td>⚡⚡⚡⚡⚡</td><td>⭐⭐</td><td>Siêu nhẹ, mô tả cơ bản</td></tr>
+<tr><td><strong>llava:7b</strong></td><td>5GB</td><td>⚡⚡⚡</td><td>⭐⭐⭐</td><td>Ổn định, phổ biến nhất</td></tr>
+<tr><td><strong>minicpm-v</strong> (8B)</td><td>6GB</td><td>⚡⚡⚡</td><td>⭐⭐⭐⭐</td><td>OCR + phân tích chi tiết</td></tr>
+<tr><td><strong>llama3.2-vision:11b</strong></td><td>8GB</td><td>⚡⚡</td><td>⭐⭐⭐⭐</td><td>Chất lượng cao, được Meta hỗ trợ</td></tr>
+<tr><td><strong>qwen2.5-vl:7b</strong></td><td>6GB</td><td>⚡⚡⚡</td><td>⭐⭐⭐⭐⭐</td><td>Tỷ lệ chất lượng/kích thước tốt nhất</td></tr>
+<tr><td><strong>qwen2.5-vl:72b</strong></td><td>48GB</td><td>⚡</td><td>⭐⭐⭐⭐⭐</td><td>Cấp độ chuyên nghiệp, cần GPU mạnh</td></tr>
+</tbody>
+</table>
+
+<!-- PROVIDER ARCHITECTURE -->
+<h2>4. Kiến trúc Đa nhà cung cấp (Multi-Provider)</h2>
+<div class="card">
+<pre>interface AIProvider {
+  name: string;
+  analyzeGroup(images, prompt): Promise&lt;AnalysisResult&gt;;
+  enhanceImage(image, instructions): Promise&lt;string&gt;;
+  isAvailable(): Promise&lt;boolean&gt;;
+}
+
+// Tự động chọn provider tốt nhất hiện có:
+// Ưu tiên 1: Ollama local (miễn phí, nhanh, riêng tư)
+// Ưu tiên 2: Gemini API (nếu có API key)  
+// Ưu tiên 3: OpenRouter (dự phòng gói miễn phí)</pre>
+<p style="margin-top:12px;color:var(--grn)">✅ Code 1 lần → chạy được với bất kỳ provider nào. Người dùng chọn trong Cài đặt.</p>
+</div>
+
+<!-- WIZARD MOCKUP -->
+<h2>5. Trình hướng dẫn thiết lập giao diện (Xem trước)</h2>
+<div class="wizard">┌──────────────────────────────────────────────┐
+│  🤖 Cài đặt AI Local                        │
+│                                              │
+│  Ollama: 🟢 Đang chạy (v0.6.2)              │
+│  Model:  [Chưa có model vision]             │
+│                                              │
+│  ┌────────────────────────────────────────┐  │
+│  │ 📂 Chọn file model (.gguf)            │  │
+│  │                                        │  │
+│  │  [  Duyệt file từ máy tính...  ]       │  │
+│  │                                        │  │
+│  │  Hoặc tải tự động:                    │  │
+│  │  • moondream (1.8GB)  [Tải]           │  │
+│  │  • llava:7b  (4.7GB)  [Tải]           │  │
+│  │  • minicpm-v (5.5GB)  [Tải]           │  │
+│  └────────────────────────────────────────┘  │
+│                                              │
+│  ████████████░░░░░░░░░░  65%                │
+│  Đang tải model lên Ollama...                │
+│                                              │
+│          [Hủy]        [Tự động cài đặt]     │
+└──────────────────────────────────────────────┘</div>
+
+</div>
+</body>
+</html>
