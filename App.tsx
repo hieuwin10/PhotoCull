@@ -6,7 +6,7 @@ import { ImageModal } from './components/ImageModal';
 import { TrashModal } from './components/TrashModal';
 import { InfoModal } from './components/InfoModal';
 import { AppState, ImageGroup, ProcessedImage } from './types';
-import { Camera, Loader2, Trash2, FolderDown, Zap, ChevronDown, ChevronUp, ArrowDown01, Sparkles, Split, Bot, SortAsc, SortDesc, Ban, Save, Upload, Play, Square, Filter, Palette, Wand2, FolderOpen, HardDrive, Download, LayoutGrid, X, Search, ListFilter, CheckSquare, ArrowDownAZ, ArrowUp, PieChart, ArrowRight, CheckCircle2, Type, Info } from 'lucide-react';
+import { Loader2, ChevronDown, ArrowDown01, Sparkles, Bot, SortAsc, SortDesc, Ban, Play, Wand2, LayoutGrid, X, Search, ListFilter, CheckSquare, ArrowDownAZ, ArrowUp, ArrowRight, CheckCircle2, Type } from 'lucide-react';
 import { downloadZip, downloadAIEditsZip, ExportOptions } from './services/downloadUtils';
 import { Virtuoso } from 'react-virtuoso';
 import { AppHeader } from './components/AppHeader';
@@ -68,6 +68,7 @@ const App: React.FC = () => {
   // Batch Edit Menu States
   const [showBatchEditMenu, setShowBatchEditMenu] = useState(false); // For "All"
   const [showRangeEditMenu, setShowRangeEditMenu] = useState(false); // For "Range"
+  const [showSortMenu, setShowSortMenu] = useState(false);
   
   // Batch Range State
   const [batchStartGroup, setBatchStartGroup] = useState(1);
@@ -103,6 +104,7 @@ const App: React.FC = () => {
   const handleSort = (criteria: typeof sortOrder) => {
     setSortOrder(criteria);
     handleSortGroups(criteria);
+    setShowSortMenu(false);
   };
 
   // Filtered Groups for Display (Status + Search)
@@ -160,10 +162,24 @@ const App: React.FC = () => {
             setShowExportMenu(false);
             setShowBatchEditMenu(false);
             setShowRangeEditMenu(false);
+            setShowSortMenu(false);
         }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+      const handleEscape = (event: KeyboardEvent) => {
+          if (event.key === 'Escape') {
+              setShowExportMenu(false);
+              setShowBatchEditMenu(false);
+              setShowRangeEditMenu(false);
+              setShowSortMenu(false);
+          }
+      };
+      document.addEventListener('keydown', handleEscape);
+      return () => document.removeEventListener('keydown', handleEscape);
   }, []);
 
   // Keyboard navigation for modal
@@ -317,12 +333,12 @@ const App: React.FC = () => {
               2. WORKSPACE TOOLBAR (Sticky bar for Search, Tools, Sort)
           ===================================================================================== */}
           {(appState === AppState.REVIEW || (appState === AppState.GROUPING && groups.length > 0)) && (
-              <div className="h-14 border-b border-gray-800 bg-gray-900/90 backdrop-blur-md sticky top-0 z-40 px-6 flex items-center justify-between shrink-0 shadow-md">
+              <div className="min-h-14 border-b border-gray-800 bg-gray-900/90 backdrop-blur-md sticky top-0 z-40 px-3 lg:px-6 py-2 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-2 shrink-0 shadow-md">
                   
                   {/* LEFT: TOOLS */}
-                  <div className="flex items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-2">
                       {/* SEARCH */}
-                      <div className="relative w-56 transition-all focus-within:w-64">
+                      <div className="relative w-full sm:w-56 transition-all sm:focus-within:w-64">
                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
                          <input 
                              type="text" 
@@ -338,7 +354,7 @@ const App: React.FC = () => {
                          )}
                      </div>
 
-                     <div className="w-px h-6 bg-gray-700 mx-2"></div>
+                     <div className="w-px h-6 bg-gray-700 mx-1 hidden md:block"></div>
 
                      {/* ANALYZE ALL */}
                      {pendingGroupsCount > 0 && (
@@ -484,7 +500,7 @@ const App: React.FC = () => {
                   </div>
 
                   {/* RIGHT: SORT & STATS */}
-                  <div className="flex items-center gap-4">
+                  <div className="flex flex-wrap items-center gap-2 xl:gap-4">
                      
                      {/* TEXT SIZE TOGGLE (NEW) */}
                      <button 
@@ -501,13 +517,14 @@ const App: React.FC = () => {
                      </button>
 
                      {/* SORT */}
-                     <div className="relative group z-40">
-                        <button className="flex items-center gap-2 px-3 py-1.5 bg-gray-950 border border-gray-700 rounded-lg text-xs font-bold text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">
+                     <div className="relative z-40">
+                        <button onClick={() => setShowSortMenu(v => !v)} className="flex items-center gap-2 px-3 py-1.5 bg-gray-950 border border-gray-700 rounded-lg text-xs font-bold text-gray-300 hover:text-white hover:bg-gray-800 transition-colors">
                             <ArrowDownAZ className="w-4 h-4" />
                             <span className="hidden lg:inline">Sắp xếp</span>
                             <ChevronDown className="w-3 h-3" />
                         </button>
-                        <div className="absolute top-full right-0 mt-2 w-56 bg-gray-900 border border-gray-700 rounded-xl shadow-xl overflow-hidden hidden group-hover:block animate-in slide-in-from-top-2">
+                        {showSortMenu && (
+                        <div className="absolute top-full right-0 mt-2 w-56 bg-gray-900 border border-gray-700 rounded-xl shadow-xl overflow-hidden animate-in slide-in-from-top-2 popup-menu">
                             <button onClick={() => handleSort('time_desc')} className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-800 flex items-center gap-2 ${sortOrder === 'time_desc' ? 'text-blue-400 bg-blue-900/10' : 'text-gray-300'}`}><SortDesc className="w-4 h-4" /> Mới nhất</button>
                             <button onClick={() => handleSort('time_asc')} className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-800 flex items-center gap-2 ${sortOrder === 'time_asc' ? 'text-blue-400 bg-blue-900/10' : 'text-gray-300'}`}><SortAsc className="w-4 h-4" /> Cũ nhất</button>
                             <div className="h-px bg-gray-800 my-1"></div>
@@ -515,6 +532,7 @@ const App: React.FC = () => {
                             <button onClick={() => handleSort('size_asc')} className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-800 flex items-center gap-2 ${sortOrder === 'size_asc' ? 'text-blue-400 bg-blue-900/10' : 'text-gray-300'}`}><ArrowUp className="w-4 h-4" /> Ít ảnh nhất</button>
                             <button onClick={() => handleSort('name_asc')} className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-800 flex items-center gap-2 ${sortOrder === 'name_asc' ? 'text-blue-400 bg-blue-900/10' : 'text-gray-300'}`}><ArrowDownAZ className="w-4 h-4" /> Tên (A-Z)</button>
                         </div>
+                        )}
                      </div>
 
                      <div className="w-px h-6 bg-gray-700 hidden lg:block"></div>
