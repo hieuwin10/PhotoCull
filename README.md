@@ -1,20 +1,23 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# PhotoCull AI
 
-# Run and deploy your AI Studio app
+Công cụ hỗ trợ nhiếp ảnh gia phân loại và chọn lọc ảnh nhanh chóng bằng trí tuệ nhân tạo (AI).
 
-This contains everything you need to run your app locally.
+## 🚀 Tính năng nổi bật
+- **Phân tích ảnh bằng AI**: Sử dụng Gemini API để nhận diện nội dung, độ nét và cảm xúc.
+- **Nhóm ảnh thông minh**: Tự động nhóm các bức ảnh tương tự nhau để dễ dàng so sánh.
+- **Giao diện mượt mà**: Hỗ trợ xử lý hàng ngàn ảnh cùng lúc nhờ kỹ thuật Virtualization.
 
-View your app in AI Studio: https://ai.studio/apps/ea5bf4fb-9eca-40e1-abef-f62ffbc570d6
+## 🛠️ Công nghệ sử dụng
+- React 19 + Vite
+- TypeScript
+- Gemini AI SDK
+- React Virtuoso
 
-## Run Locally
+## 📖 Tài liệu dự án
+Các tài liệu chi tiết phục vụ cho việc phát triển và xây dựng lại hệ thống:
+- [Tài liệu hệ thống hiện tại](docs/md/CURRENT_SYSTEM.md)
+- [Yêu cầu sản phẩm mới (PRD)](docs/md/NEW_SYSTEM_PRD.md)
+- [Kiến trúc hệ thống đề xuất](docs/md/NEW_ARCHITECTURE.md)
 
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+---
+*Lưu ý: Dự án đang trong quá trình tái cấu trúc (dập đi xây lại).*
