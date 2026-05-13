@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PhotoCull Explanation</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <a class="brand" href="index.html"><span class="brand-mark">PC</span><span>Explanation</span></a>
+        <nav class="nav">
+          <a href="index.html">Tổng quan</a>
+          <a href="tutorials.html">Tutorials</a>
+          <a href="how-to.html">How-To</a>
+          <a href="reference.html">Reference</a>
+        </nav>
+      </header>
+      <section class="section">
+        <span class="pill">Bối cảnh thiết kế</span>
+        <h2>Explanation</h2>
+        <div class="grid">
+          <article class="card">
+            <h3>Lý do sản phẩm</h3>
+            <p>PhotoCull tập trung vào chọn lọc ảnh, không thay thế phần mềm hậu kỳ.</p>
+          </article>
+          <article class="card">
+            <h3>Lý do kiến trúc</h3>
+            <p>Tách module để xử lý vấn đề `App.tsx` lớn, state khó bảo trì và thiếu test.</p>
+          </article>
+          <article class="card">
+            <h3>AI và quyền riêng tư</h3>
+            <p>Cloud AI phải minh bạch, local-first là mặc định phù hợp cho ảnh cá nhân.</p>
+          </article>
+          <article class="card">
+            <h3>Vòng đời phát triển</h3>
+            <p>Yêu cầu, kiến trúc, hiện thực, kiểm thử, vận hành được quản lý thành từng pha.</p>
+          </article>
+        </div>
+      </section>
+      <footer class="footer">Markdown nguồn: ../md/explanation/</footer>
+    </main>
+  </body>
+</html>

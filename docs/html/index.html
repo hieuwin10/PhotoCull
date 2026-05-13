@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PhotoCull Documentation</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <a class="brand" href="index.html" aria-label="PhotoCull Documentation">
+          <span class="brand-mark">PC</span>
+          <span>PhotoCull Docs</span>
+        </a>
+        <nav class="nav" aria-label="Điều hướng tài liệu">
+          <a href="#diataxis">Diátaxis</a>
+          <a href="#lifecycle">Vòng đời</a>
+          <a href="#architecture">Kiến trúc</a>
+          <a href="#operations">Vận hành</a>
+        </nav>
+      </header>
+
+      <section class="hero">
+        <div>
+          <span class="pill">Tài liệu dự án</span>
+          <h1>PhotoCull AI</h1>
+          <p>
+            Bộ tài liệu tiếng Việt cho ứng dụng chọn lọc ảnh bằng AI, được tổ chức theo Diátaxis và bao phủ đầy đủ
+            yêu cầu, kiến trúc, hiện thực, kiểm thử và vận hành.
+          </p>
+          <p>
+            Bản Markdown nằm trong <strong>docs/md</strong> để AI và lập trình viên tra cứu nhanh. Bản HTML này nằm
+            trong <strong>docs/html</strong> để xem trực quan.
+          </p>
+        </div>
+        <div class="hero-visual" aria-label="Minh họa giao diện chọn lọc ảnh">
+          <div class="photo-stack">
+            <div class="shot"></div>
+            <div class="shot"></div>
+            <div class="shot"></div>
+            <div class="shot"></div>
+          </div>
+          <div class="status-ribbon">
+            <span>1.248 ảnh</span>
+            <span>AI: đang phân tích</span>
+            <span>Giữ: 318</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="diataxis" class="section">
+        <h2>Cấu trúc Diátaxis</h2>
+        <p class="lead">
+          Mỗi nhóm tài liệu phục vụ một mục đích riêng để tránh lẫn lộn giữa học, làm, tra cứu và giải thích.
+        </p>
+        <div class="grid">
+          <article class="card">
+            <span class="pill">Tutorials</span>
+            <h3>Học theo luồng</h3>
+            <p>Làm quen dự án, hiểu sản phẩm, đi qua luồng xây lại PhotoCull từ đầu đến cuối.</p>
+            <p><strong>File:</strong> ../md/tutorials/</p>
+          </article>
+          <article class="card">
+            <span class="pill">How-To</span>
+            <h3>Làm tác vụ cụ thể</h3>
+            <p>Thêm tính năng, tích hợp AI provider, viết test, build và vận hành.</p>
+            <p><strong>File:</strong> ../md/how-to/</p>
+          </article>
+          <article class="card">
+            <span class="pill">Reference</span>
+            <h3>Tra cứu chuẩn</h3>
+            <p>Yêu cầu, kiến trúc, quy ước hiện thực, kiểm thử, vận hành và mô hình dữ liệu.</p>
+            <p><strong>File:</strong> ../md/reference/</p>
+          </article>
+          <article class="card">
+            <span class="pill">Explanation</span>
+            <h3>Hiểu lý do</h3>
+            <p>Lý do sản phẩm, kiến trúc, AI và quyền riêng tư, vòng đời phát triển.</p>
+            <p><strong>File:</strong> ../md/explanation/</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="lifecycle" class="section">
+        <h2>Vòng đời phát triển</h2>
+        <div class="timeline">
+          <div class="step">
+            <strong>Yêu cầu</strong>
+            <span>Chốt người dùng chính, luồng chọn lọc ảnh, tiêu chí MVP và yêu cầu quyền riêng tư.</span>
+          </div>
+          <div class="step">
+            <strong>Kiến trúc</strong>
+            <span>Tách UI, feature module, Zustand store, service layer, AI adapter và IndexedDB.</span>
+          </div>
+          <div class="step">
+            <strong>Hiện thực</strong>
+            <span>Xây theo lát dọc: import ảnh, grid ảo hóa, chọn lọc, AI, lưu phiên, so sánh.</span>
+          </div>
+          <div class="step">
+            <strong>Kiểm thử</strong>
+            <span>Unit test cho store/service, component test cho UI, integration test cho IndexedDB và AI mock.</span>
+          </div>
+          <div class="step">
+            <strong>Vận hành</strong>
+            <span>Build artifact tĩnh, bảo vệ API key, kiểm soát upload ảnh và smoke test trước phát hành.</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="architecture" class="section">
+        <h2>Kiến trúc mục tiêu</h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Lớp</th>
+              <th>Trách nhiệm</th>
+              <th>Ghi chú</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>UI</td>
+              <td>Hiển thị grid, compare view, toolbar, panel AI.</td>
+              <td>Không gọi trực tiếp Gemini hoặc IndexedDB.</td>
+            </tr>
+            <tr>
+              <td>Store</td>
+              <td>Quản lý ảnh, selection, rating, kết quả AI và trạng thái UI.</td>
+              <td>Dùng selector để giảm re-render.</td>
+            </tr>
+            <tr>
+              <td>Service</td>
+              <td>AI, storage, image processing, export.</td>
+              <td>Che giấu SDK và IO khỏi component.</td>
+            </tr>
+            <tr>
+              <td>Types</td>
+              <td>Contract dữ liệu cho ảnh, nhóm ảnh, AI result, session.</td>
+              <td>Là nguồn ổn định cho AI/dev khi lập trình.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="operations" class="section band">
+        <h2>Vận hành và bảo mật</h2>
+        <p>
+          PhotoCull nên vận hành theo hướng local-first. Ảnh không được tự động tải lên cloud. Khi bật Gemini hoặc
+          provider cloud khác, UI cần thể hiện rõ ảnh sẽ được gửi ra ngoài.
+        </p>
+        <ul>
+          <li>Không commit API key hoặc file `.env`.</li>
+          <li>Không log tên file, metadata nhạy cảm hoặc nội dung ảnh.</li>
+          <li>AI provider phải đi qua adapter để dễ thay Gemini, local model hoặc mock.</li>
+          <li>Build production nằm trong `dist/` và cần smoke test trước phát hành.</li>
+        </ul>
+      </section>
+
+      <footer class="footer">
+        PhotoCull Documentation. Nguồn Markdown chính: <strong>docs/md/index.md</strong>.
+      </footer>
+    </main>
+  </body>
+</html>

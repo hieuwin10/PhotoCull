@@ -1,23 +1,40 @@
 # PhotoCull AI
 
-Công cụ hỗ trợ nhiếp ảnh gia phân loại và chọn lọc ảnh nhanh chóng bằng trí tuệ nhân tạo (AI).
+PhotoCull là công cụ hỗ trợ nhiếp ảnh gia phân loại, so sánh và chọn lọc ảnh nhanh bằng AI. Dự án đang trong giai đoạn tái cấu trúc để xây lại theo kiến trúc dễ mở rộng, local-first và có kiểm thử rõ ràng.
 
-## 🚀 Tính năng nổi bật
-- **Phân tích ảnh bằng AI**: Sử dụng Gemini API để nhận diện nội dung, độ nét và cảm xúc.
-- **Nhóm ảnh thông minh**: Tự động nhóm các bức ảnh tương tự nhau để dễ dàng so sánh.
-- **Giao diện mượt mà**: Hỗ trợ xử lý hàng ngàn ảnh cùng lúc nhờ kỹ thuật Virtualization.
+## Tính năng mục tiêu
 
-## 🛠️ Công nghệ sử dụng
-- React 19 + Vite
-- TypeScript
-- Gemini AI SDK
-- React Virtuoso
+- Nhập và hiển thị mượt hàng nghìn ảnh bằng virtualization.
+- Nhóm ảnh tương tự để so sánh nhanh.
+- Phân tích ảnh bằng AI qua adapter, ưu tiên quyền riêng tư.
+- Đánh sao, giữ, loại ảnh bằng UI và phím tắt.
+- Lưu phiên làm việc bằng IndexedDB.
 
-## 📖 Tài liệu dự án
-Các tài liệu chi tiết phục vụ cho việc phát triển và xây dựng lại hệ thống:
-- [Tài liệu hệ thống hiện tại](docs/CURRENT_SYSTEM.md)
-- [Yêu cầu sản phẩm mới (PRD)](docs/NEW_SYSTEM_PRD.md)
-- [Kiến trúc hệ thống đề xuất](docs/NEW_ARCHITECTURE.md)
+## Stack mục tiêu
 
----
-*Lưu ý: Dự án đang trong quá trình tái cấu trúc (dập đi xây lại).*
+- React 19 + Vite.
+- TypeScript.
+- Zustand.
+- Gemini AI SDK qua `AIService`.
+- React Virtuoso.
+- IndexedDB.
+- Vitest, Testing Library, Playwright nếu có E2E.
+
+## Tài liệu
+
+Bộ tài liệu mới nằm trong:
+
+- `docs/md/`: Markdown thuần chữ, tối ưu cho AI và lập trình viên.
+- `docs/html/`: HTML/CSS tiếng Việt với giao diện trực quan.
+
+Điểm bắt đầu:
+
+- Markdown: `docs/md/index.md`.
+- HTML: `docs/html/index.html`.
+
+Tài liệu được tổ chức theo Diátaxis:
+
+- Tutorials: học theo luồng từng bước.
+- How-To: hướng dẫn làm tác vụ cụ thể.
+- Reference: tra cứu yêu cầu, kiến trúc, test, vận hành, dữ liệu.
+- Explanation: giải thích lý do sản phẩm và kiến trúc.
