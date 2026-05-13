@@ -15,9 +15,9 @@ Công cụ hỗ trợ nhiếp ảnh gia phân loại và chọn lọc ảnh nhan
 
 ## 📖 Tài liệu dự án
 Các tài liệu chi tiết phục vụ cho việc phát triển và xây dựng lại hệ thống:
-- [Tài liệu hệ thống hiện tại](docs/md/CURRENT_SYSTEM.md)
-- [Yêu cầu sản phẩm mới (PRD)](docs/md/NEW_SYSTEM_PRD.md)
-- [Kiến trúc hệ thống đề xuất](docs/md/NEW_ARCHITECTURE.md)
+- [Tài liệu hệ thống hiện tại](docs/CURRENT_SYSTEM.md)
+- [Yêu cầu sản phẩm mới (PRD)](docs/NEW_SYSTEM_PRD.md)
+- [Kiến trúc hệ thống đề xuất](docs/NEW_ARCHITECTURE.md)
 
 ---
 *Lưu ý: Dự án đang trong quá trình tái cấu trúc (dập đi xây lại).*
