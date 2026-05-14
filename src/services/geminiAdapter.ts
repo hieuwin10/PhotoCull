@@ -13,9 +13,34 @@ export class GeminiAdapter {
     }
 
     const client = new GoogleGenAI({ apiKey: input.apiKey });
+    const contents: any[] = [`${input.prompt}\nAnalyze image: ${input.image.fileName}`];
+
+    if (input.image.blob) {
+      const base64 = await blobToBase64(input.image.blob);
+      contents.push({
+        inlineData: {
+          data: base64,
+          mimeType: input.image.mimeType
+        }
+      });
+    }
+
     const response = await client.models.generateContent({
       model: 'gemini-2.5-flash',
-      contents: `${input.prompt}\nReturn JSON with keys: tags, qualityScore(0-100), suggestion(keep|reject), rationale. Analyze image metadata: ${input.image.fileName}`
+      contents: contents,
+      config: {
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: 'OBJECT',
+          properties: {
+            tags: { type: 'ARRAY', items: { type: 'STRING' } },
+            qualityScore: { type: 'INTEGER' },
+            suggestion: { type: 'STRING' },
+            rationale: { type: 'STRING' }
+          },
+          required: ['tags', 'qualityScore', 'suggestion', 'rationale']
+        }
+      }
     });
 
     const raw = response.text?.trim() ?? '{}';
@@ -45,4 +70,16 @@ function clampNumber(value: unknown, min: number, max: number, fallback: number)
     return fallback;
   }
   return Math.min(max, Math.max(min, value));
+}
+
+function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64 = reader.result as string;
+      resolve(base64.split(',')[1]);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
 }

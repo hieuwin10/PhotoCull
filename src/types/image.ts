@@ -7,6 +7,7 @@ export interface ImageAsset {
   size: number;
   lastModified: number;
   previewUrl: string;
+  blob?: Blob;
   createdAt: number;
 }
 

@@ -15,7 +15,14 @@ export const useImageStore = create<ImageStoreState>((set, get) => ({
   filteredIds: [],
   importImages: (newImages) => {
     const currentIds = new Set(get().images.map((img) => img.id));
-    const deduped = newImages.filter((img) => !currentIds.has(img.id));
+    const seenInBatch = new Set<string>();
+    const deduped = newImages.filter((img) => {
+      if (currentIds.has(img.id) || seenInBatch.has(img.id)) {
+        return false;
+      }
+      seenInBatch.add(img.id);
+      return true;
+    });
     set((state) => ({
       images: [...state.images, ...deduped],
       filteredIds: [...state.filteredIds, ...deduped.map((img) => img.id)]

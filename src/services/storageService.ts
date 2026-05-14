@@ -37,7 +37,13 @@ export const storageService = {
 
   async getImages(): Promise<ImageAsset[]> {
     const db = await dbPromise;
-    return db.getAll('images');
+    const images = await db.getAll('images');
+    return images.map((img) => {
+      if (img.blob) {
+        img.previewUrl = URL.createObjectURL(img.blob);
+      }
+      return img;
+    });
   },
 
   async saveAnalysis(result: AnalyzeImageResult): Promise<void> {
